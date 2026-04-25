@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 
     private int score;
     private float time;
+    private bool isRunning;
 
     private void Awake()
     {
@@ -17,11 +18,20 @@ public class GameManager : MonoBehaviour
     {
         PlayerMovement.instance.onCoinPickUp += lander_onCoinPickUp;
         PlayerMovement.instance.onLanded += Lander_onLanded;
+        PlayerMovement.instance.onStateChange += Lander_onStateChange; ;
     }
+
+    private void Lander_onStateChange(object sender, PlayerMovement.OnStateChangeEventArgs e)
+    {
+        isRunning = e.ste == PlayerMovement.State.Normal;
+    }
+
 
     private void Update()
     {
-        time += Time.deltaTime;
+       if(isRunning) {
+         time += Time.deltaTime;
+       }
     }
 
     private void Lander_onLanded(object sender, PlayerMovement.OnLandedEventArgs e)

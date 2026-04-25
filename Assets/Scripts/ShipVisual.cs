@@ -6,24 +6,40 @@ public class ShipVisual : MonoBehaviour
     [SerializeField] ParticleSystem middleThrusterParticleSystem;
     [SerializeField] ParticleSystem leftThrusterParticleSystem;
     [SerializeField] ParticleSystem rightThrusterParticleSystem;
+    [SerializeField] GameObject landerVfx;
 
-
-    private PlayerMovement lander;
 
     private void Awake()
     {
-        lander = GetComponent<PlayerMovement>();
-        lander.onUpForce += lander_OnUpForce ;
-        lander.onLeftForce += lander_OnLeftForce;
-        lander.onRightForce += lander_OnRightForce;
-
-        lander.onBeforeForce += lander_OnBeforeForce;
+        PlayerMovement.instance.onUpForce += lander_OnUpForce ;
+        PlayerMovement.instance.onLeftForce += lander_OnLeftForce;
+        PlayerMovement.instance.onRightForce += lander_OnRightForce;
+        PlayerMovement.instance.onBeforeForce += lander_OnBeforeForce;
 
         SetEnabledThrusterPaticleSystem(middleThrusterParticleSystem, false);
         SetEnabledThrusterPaticleSystem(leftThrusterParticleSystem, false);
         SetEnabledThrusterPaticleSystem(rightThrusterParticleSystem, false);
 
 
+    }
+
+    private void Start()
+    {
+        PlayerMovement.instance.onLanded += Lander_onLanded;
+    }
+
+    private void Lander_onLanded(object sender, PlayerMovement.OnLandedEventArgs e)
+    {
+        switch(e.landingType)
+        {
+            case PlayerMovement.LandingType.TooSpeedLanding:
+            case PlayerMovement.LandingType.TooSteepAngle:
+            case PlayerMovement.LandingType.WrongLandingArea:
+                Instantiate(landerVfx, transform.position, Quaternion.identity);
+                gameObject.SetActive(false);
+                break;
+
+        }
     }
 
     private void lander_OnBeforeForce(object sender, EventArgs e)

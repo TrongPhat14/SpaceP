@@ -4,12 +4,15 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+    private const float GRAVITY_NORMAL = 0.7f;
+
     public static PlayerMovement instance { get; private set; }
 
     public event EventHandler onUpForce;
     public event EventHandler onLeftForce;
     public event EventHandler onRightForce;
     public event EventHandler onBeforeForce;
+    public event EventHandler<OnStateChangeEventArgs> onStateChange;
     public event EventHandler onCoinPickUp;
     public event EventHandler<OnLandedEventArgs> onLanded;
     public class OnLandedEventArgs : EventArgs
@@ -20,6 +23,10 @@ public class PlayerMovement : MonoBehaviour
         public float speed;
         public int scoreMultiplier;
     }
+    public class OnStateChangeEventArgs : EventArgs
+    {
+        public State ste;
+    }
 
     public enum LandingType
     {
@@ -29,9 +36,18 @@ public class PlayerMovement : MonoBehaviour
         TooSteepAngle,
     }
 
+    public enum State
+    {
+        Normal,
+        WaitingToStart,
+        GameOver,
+    }
+
+
     private Rigidbody2D rd;
     private float fuelAmount;
     private float fuelAmountMax = 10f;
+    private State state;
 
 
 
@@ -39,45 +55,68 @@ public class PlayerMovement : MonoBehaviour
     {
         instance = this;
         fuelAmount = fuelAmountMax;
+        state = State.WaitingToStart;
+        LandingPlace landingPlace = GetComponent<LandingPlace>();
         rd = GetComponent<Rigidbody2D>();
+        rd.gravityScale = 0f;
 
     }
 
     private void FixedUpdate()
     {
+
         onBeforeForce?.Invoke(this, EventArgs.Empty);
 
-        if(fuelAmount <= 0f)
+        switch (state)
         {
-            return;
+            default: 
+            case State.WaitingToStart:
+                if (Keyboard.current.upArrowKey.isPressed ||
+                    Keyboard.current.leftArrowKey.isPressed ||
+                    Keyboard.current.rightArrowKey.isPressed) { 
+                    ConsumeFuel();
+                    rd.gravityScale = GRAVITY_NORMAL;
+                    SetState(State.Normal);
+                }
+                break;
+            case State.Normal:
+                if (fuelAmount <= 0f)
+                {
+                    return;
+                }
+
+                if (Keyboard.current.upArrowKey.isPressed ||
+                   Keyboard.current.leftArrowKey.isPressed ||
+                   Keyboard.current.rightArrowKey.isPressed)
+                {
+                    ConsumeFuel();
+                }
+                if (Keyboard.current.upArrowKey.isPressed)
+                {
+                    float force = 700f;
+                    rd.AddForce(force * transform.up * Time.deltaTime);
+                    onUpForce?.Invoke(this, EventArgs.Empty);
+                }
+                if (Keyboard.current.leftArrowKey.isPressed)
+                {
+                    float turnSpeed = +100f;
+                    rd.AddTorque(turnSpeed * Time.deltaTime);
+                    onLeftForce?.Invoke(this, EventArgs.Empty);
+
+                }
+                if (Keyboard.current.rightArrowKey.isPressed)
+                {
+                    float turnSpeed = -100f;
+                    rd.AddTorque(turnSpeed * Time.deltaTime);
+                    onRightForce?.Invoke(this, EventArgs.Empty);
+                }
+                break;
+            case State.GameOver:
+                break;
         }
 
-        if(Keyboard.current.upArrowKey.isPressed ||
-           Keyboard.current.leftArrowKey.isPressed||
-           Keyboard.current.rightArrowKey.isPressed)
-        {
-            ConsumeFuel();
 
-        }
-        if (Keyboard.current.upArrowKey.isPressed)
-        {
-            float force = 700f;
-            rd.AddForce(force * transform.up * Time.deltaTime);
-            onUpForce?.Invoke(this, EventArgs.Empty);
-        }
-        if (Keyboard.current.leftArrowKey.isPressed)
-        {
-            float turnSpeed = +100f;
-            rd.AddTorque(turnSpeed * Time.deltaTime);
-            onLeftForce?.Invoke(this, EventArgs.Empty);
-
-        }
-        if (Keyboard.current.rightArrowKey.isPressed)
-        {
-            float turnSpeed = -100f;
-            rd.AddTorque(turnSpeed * Time.deltaTime);
-            onRightForce?.Invoke(this, EventArgs.Empty);
-        }
+       
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -93,6 +132,7 @@ public class PlayerMovement : MonoBehaviour
                 scoreMultiplier = 0,
                 score = 0,
             });
+            SetState(State.GameOver);
             return;
         }
         float softLandingVelocityMagnitude = 4f;
@@ -108,6 +148,7 @@ public class PlayerMovement : MonoBehaviour
                 scoreMultiplier = 0,
                 score = 0,
             });
+            SetState(State.GameOver);
             return;
         }
 
@@ -124,6 +165,7 @@ public class PlayerMovement : MonoBehaviour
                 scoreMultiplier = 0,
                 score = 0,
             });
+            SetState(State.GameOver);
             return;
         }
         
@@ -151,6 +193,7 @@ public class PlayerMovement : MonoBehaviour
             scoreMultiplier = landingPlace.GetScoreMultiplier(),
             score = score,
         }) ;
+        SetState(State.GameOver);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -171,6 +214,16 @@ public class PlayerMovement : MonoBehaviour
             onCoinPickUp?.Invoke(this, EventArgs.Empty);
             coin.DestroyCoin();
         }
+    }
+
+
+    private void SetState(State state)
+    {
+        this.state = state;
+        onStateChange?.Invoke(this, new OnStateChangeEventArgs
+        {
+            ste = state
+        }); ;
     }
 
     public float GetFuelAmountNormalized()
