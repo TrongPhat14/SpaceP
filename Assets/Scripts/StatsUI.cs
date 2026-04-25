@@ -17,7 +17,8 @@ public class StatsUI : MonoBehaviour
     {
         fuelImage.fillAmount = PlayerMovement.instance.GetFuelAmountNormalized();
         statsText.text =
-            GameManager.instance.GetScore() + "\n" + "\n" +
+            GameManager.instance.GetLevelNumber() + "\n" +
+            GameManager.instance.GetScore() + "\n" +
             Mathf.Round(GameManager.instance.GetTime())
             ;
     }
