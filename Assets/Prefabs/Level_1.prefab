@@ -771,6 +771,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameLevel
   gameLevel: 1
   landerStartPosition: {fileID: 6543056856314686930}
+  cameraStartPosition: {fileID: 1049004350377696494}
+  zoomOutOrthographicSize: 30
 --- !u!1 &7752149863983987764
 GameObject:
   m_ObjectHideFlags: 0
