@@ -18,7 +18,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2528793770665625592, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
       propertyPath: m_Size.y
-      value: 0.63153315
+      value: 0.65894014
       objectReference: {fileID: 0}
     - target: {fileID: 2528793770665625592, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
       propertyPath: m_Offset.x
@@ -26,7 +26,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2528793770665625592, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
       propertyPath: m_Offset.y
-      value: -0.07050441
+      value: -0.05680093
+      objectReference: {fileID: 0}
+    - target: {fileID: 2528793770665625592, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
+      propertyPath: m_LayerOverridePriority
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2898902681718178956, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
       propertyPath: m_LocalScale.x
@@ -100,9 +104,29 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4306729628489511561, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4306729628489511561, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5830134209287072199, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
+      propertyPath: m_text
+      value: x5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5830134209287072199, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
+      propertyPath: m_fontSize
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5830134209287072199, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 7813927795619135738, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
       propertyPath: scoreMultiplier
-      value: 5
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
