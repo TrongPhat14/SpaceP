@@ -15,14 +15,17 @@ public class CinemachineCameraZoom : MonoBehaviour
     {
         Instance = this;
     }
-
-    public void Update()
+    private void LateUpdate()
     {
         float zoomSpead = 2f;
-        cinemachineCamera.Lens.OrthographicSize = 
-            Mathf.Lerp(cinemachineCamera.Lens.OrthographicSize,targetOrthographicSize, Time.deltaTime * zoomSpead);
+        cinemachineCamera.Lens.OrthographicSize =
+            Mathf.Lerp(cinemachineCamera.Lens.OrthographicSize, targetOrthographicSize, Time.deltaTime * zoomSpead);
     }
-
+/*    public void Update()
+    {
+        
+    }
+*/
     public void SetTargetOrthographicSize(float targetOrthographicSize)
     {
         this.targetOrthographicSize = targetOrthographicSize;

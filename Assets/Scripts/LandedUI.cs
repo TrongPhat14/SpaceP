@@ -54,12 +54,6 @@ public class LandedUI : MonoBehaviour
             "x" + e.scoreMultiplier + "\n" +
             e.score;
 
-        Debug.Log(e.speed);
-        Debug.Log(e.dotVector);
-        Debug.Log(e.scoreMultiplier);
-        Debug.Log(e.score);
-
-
         Show();
     }
 

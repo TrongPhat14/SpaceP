@@ -71,9 +71,11 @@ public class PlayerMovement : MonoBehaviour
         {
             default: 
             case State.WaitingToStart:
-                if (Keyboard.current.upArrowKey.isPressed ||
-                    Keyboard.current.leftArrowKey.isPressed ||
-                    Keyboard.current.rightArrowKey.isPressed) { 
+                if (GameInput.Instance.IsUpActionPressed() ||
+                    GameInput.Instance.IsRightActionPressed() ||
+                    GameInput.Instance.IsLeftActionPressed() ||
+                    GameInput.Instance.GetMovementInputVector2() != Vector2.zero)
+                { 
                     ConsumeFuel();
                     rd.gravityScale = GRAVITY_NORMAL;
                     SetState(State.Normal);
@@ -85,26 +87,29 @@ public class PlayerMovement : MonoBehaviour
                     return;
                 }
 
-                if (Keyboard.current.upArrowKey.isPressed ||
-                   Keyboard.current.leftArrowKey.isPressed ||
-                   Keyboard.current.rightArrowKey.isPressed)
+                if (GameInput.Instance.IsUpActionPressed() ||
+                    GameInput.Instance.IsRightActionPressed() ||
+                    GameInput.Instance.IsLeftActionPressed() ||
+                    GameInput.Instance.GetMovementInputVector2()  != Vector2.zero )
                 {
                     ConsumeFuel();
                 }
-                if (Keyboard.current.upArrowKey.isPressed)
+
+                float gamePadDeadZone = .4f;
+                if (GameInput.Instance.IsUpActionPressed()  || GameInput.Instance.GetMovementInputVector2().y > gamePadDeadZone)
                 {
                     float force = 700f;
                     rd.AddForce(force * transform.up * Time.deltaTime);
                     onUpForce?.Invoke(this, EventArgs.Empty);
                 }
-                if (Keyboard.current.leftArrowKey.isPressed)
+                if (GameInput.Instance.IsLeftActionPressed() )
                 {
                     float turnSpeed = +100f;
                     rd.AddTorque(turnSpeed * Time.deltaTime);
                     onLeftForce?.Invoke(this, EventArgs.Empty);
 
                 }
-                if (Keyboard.current.rightArrowKey.isPressed)
+                if (GameInput.Instance.IsRightActionPressed() )
                 {
                     float turnSpeed = -100f;
                     rd.AddTorque(turnSpeed * Time.deltaTime);
