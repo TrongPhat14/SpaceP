@@ -19,14 +19,15 @@ public class LandedUI : MonoBehaviour
         nextButton.onClick.AddListener(() =>
         {
             nextButtonClickAction();
-            SceneManager.LoadScene(0);
         });
     }
 
     private void Start()
     {
+
         PlayerMovement.instance.onLanded += lander_onLanded;
 
+        nextButton.Select();
         Hide();
 
     }

@@ -14,6 +14,8 @@ public class PlayerMovement : MonoBehaviour
     public event EventHandler onBeforeForce;
     public event EventHandler<OnStateChangeEventArgs> onStateChange;
     public event EventHandler onCoinPickUp;
+    public event EventHandler onFuelPickUp;
+    public event EventHandler onWindForce;
     public event EventHandler<OnLandedEventArgs> onLanded;
     public class OnLandedEventArgs : EventArgs
     {
@@ -203,6 +205,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        
         if (collision.gameObject.TryGetComponent(out FuelPickUp fuel))
         {
             float addFuelAmount = 10f;
@@ -211,6 +214,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 fuelAmount = fuelAmountMax;
             }
+            onFuelPickUp?.Invoke(this, EventArgs.Empty);
             fuel.DestroyFuel();
         }
 
@@ -220,8 +224,15 @@ public class PlayerMovement : MonoBehaviour
             coin.DestroyCoin();
         }
     }
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.gameObject.TryGetComponent(out WindForce wind))
+        {
+            onWindForce?.Invoke(this, EventArgs.Empty);
 
-
+            rd.AddForce(wind.GetDirection() * wind.GetStrength(), ForceMode2D.Force);
+        }
+    }
     private void SetState(State state)
     {
         this.state = state;

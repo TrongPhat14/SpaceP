@@ -5,8 +5,9 @@ public static class SceneLoader
 {
     public enum Scene
     {
-        MainMenuScene,
+        MainMenuScreen,
         GameScene,
+        GameOverScreen,
     }
 
     public static void LoadScene(Scene scene)

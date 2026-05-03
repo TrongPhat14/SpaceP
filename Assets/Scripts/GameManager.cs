@@ -11,6 +11,17 @@ public class GameManager : MonoBehaviour
     public static GameManager instance { get; private set; }
 
     private static int levelNumber = 1;
+    private static int totalScore = 0;
+
+    public static void ResetStaticData()
+    {
+        levelNumber = 1;
+        totalScore = 0;
+    }
+
+    public event EventHandler OnGamePaused;
+    public event EventHandler OnGameUnPaused;
+
     [SerializeField] private List<GameLevel> gameLevelList;
     [SerializeField] private CinemachineCamera  cinemachineCamera;
 
@@ -28,7 +39,13 @@ public class GameManager : MonoBehaviour
         PlayerMovement.instance.onLanded += Lander_onLanded;
         PlayerMovement.instance.onStateChange += Lander_onStateChange; ;
 
+        GameInput.Instance.OnMenuButtonPressed += GameInput_OnMenuButtonPressed;
         loadCurrentLevel();
+    }
+
+    private void GameInput_OnMenuButtonPressed(object sender, EventArgs e)
+    {
+        PauseOrUnPauseGame();
     }
 
     private void Lander_onStateChange(object sender, PlayerMovement.OnStateChangeEventArgs e)
@@ -52,16 +69,23 @@ public class GameManager : MonoBehaviour
 
     private void loadCurrentLevel()
     {
-        foreach(GameLevel level in gameLevelList)
+        GameLevel gamelevel = GetGameLevel();
+        GameLevel spawnedGameLevel = Instantiate(gamelevel, UnityEngine.Vector3.zero, UnityEngine.Quaternion.identity);
+        PlayerMovement.instance.transform.position = spawnedGameLevel.GetLanderStartPosition();
+        cinemachineCamera.Target.TrackingTarget = spawnedGameLevel.GetCameraStartTargetTransform();
+        CinemachineCameraZoom.Instance.SetTargetOrthographicSize(spawnedGameLevel.GetZoomOutOrthographicSize());
+    }
+
+    private GameLevel GetGameLevel()
+    {
+        foreach (GameLevel level in gameLevelList)
         {
-            if(level.GetLevelNumber() == levelNumber)
+            if (level.GetLevelNumber() == levelNumber)
             {
-               GameLevel spawnedGameLevel =  Instantiate(level, UnityEngine.Vector3.zero, UnityEngine.Quaternion.identity);
-               PlayerMovement.instance.transform.position =  spawnedGameLevel.GetLanderStartPosition();
-               cinemachineCamera.Target.TrackingTarget = spawnedGameLevel.GetCameraStartTargetTransform();
-               CinemachineCameraZoom.Instance.SetTargetOrthographicSize(spawnedGameLevel.GetZoomOutOrthographicSize());
+                return level;
             }
         }
+        return null;
     }
 
     private void Lander_onLanded(object sender, PlayerMovement.OnLandedEventArgs e)
@@ -88,11 +112,24 @@ public class GameManager : MonoBehaviour
     {
         return time;
     }
-
+    public int GetTotalScore()
+    {
+        return totalScore;
+    }
     public void NextLevel()
     {
         levelNumber++;
-        SceneLoader.LoadScene(SceneLoader.Scene.GameScene);
+        totalScore += score;
+
+        if(GetGameLevel() == null)
+        {
+            SceneLoader.LoadScene(SceneLoader.Scene.GameOverScreen);
+
+        }
+        else
+        {
+            SceneLoader.LoadScene(SceneLoader.Scene.GameScene);
+        }
     }
 
     public void RetryLevel()
@@ -103,5 +140,26 @@ public class GameManager : MonoBehaviour
     public int GetLevelNumber()
     {
         return levelNumber;
+    }
+    public void PauseOrUnPauseGame()
+    {
+        if (Time.timeScale == 1f)
+        {
+            PauseGame();
+        }
+        else
+        {
+            UnPauseGame();
+        }
+    }
+    public void PauseGame()
+    {
+        Time.timeScale = 0f;
+        OnGamePaused?.Invoke(this, EventArgs.Empty);
+    }
+    public void UnPauseGame()
+    {
+        Time.timeScale = 1f;
+        OnGameUnPaused?.Invoke(this, EventArgs.Empty);
     }
 }
