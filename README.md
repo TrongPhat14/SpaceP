@@ -60,7 +60,7 @@ Sound effects for:
 
 ## 📹 Gameplay Demo
 
-(Add a short gameplay video or GIF here)
+(https://drive.google.com/drive/folders/1CTMMpAY1NcgH4oJ6Y69sNDRRw6_i_gyu)
 
 ## 🛠️ How to Run
 
