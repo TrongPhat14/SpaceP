@@ -14,6 +14,7 @@ public class SoundManager : MonoBehaviour
 
     [SerializeField] private AudioClip fuelPickUpAudioClip;
     [SerializeField] private AudioClip coinPickUpAudioClip;
+    [SerializeField] private AudioClip WindAudioClip;
     [SerializeField] private AudioClip landedSuccessfullAudioClip;
     [SerializeField] private AudioClip crashAudioClip;
 
@@ -25,8 +26,11 @@ public class SoundManager : MonoBehaviour
     {
         PlayerMovement.instance.onCoinPickUp += Player_onCoinPickUp;
         PlayerMovement.instance.onFuelPickUp += Player_onFuelPickUp;
+        PlayerMovement.instance.onWindForce += Player_onWindForce;
         PlayerMovement.instance.onLanded += Player_onLanded;
     }
+
+
 
     private void Player_onLanded(object sender, PlayerMovement.OnLandedEventArgs e)
     {
@@ -50,6 +54,10 @@ public class SoundManager : MonoBehaviour
     {
         AudioSource.PlayClipAtPoint(coinPickUpAudioClip, Camera.main.transform.position, GetSoundVolumeNormalized());
 
+    }
+    private void Player_onWindForce(object sender, EventArgs e)
+    {
+        AudioSource.PlayClipAtPoint(WindAudioClip, Camera.main.transform.position, GetSoundVolumeNormalized());
     }
 
     public void ChangeSoundVolume()

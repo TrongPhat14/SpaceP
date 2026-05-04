@@ -229,7 +229,6 @@ public class PlayerMovement : MonoBehaviour
         if (collision.gameObject.TryGetComponent(out WindForce wind))
         {
             onWindForce?.Invoke(this, EventArgs.Empty);
-
             rd.AddForce(wind.GetDirection() * wind.GetStrength(), ForceMode2D.Force);
         }
     }
