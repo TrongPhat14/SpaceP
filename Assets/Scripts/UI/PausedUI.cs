@@ -25,6 +25,7 @@ public class PausedUI : MonoBehaviour
         });
         resumeButon.onClick.AddListener(() => {
             GameManager.instance.UnPauseGame();
+            SettingUI.Instance.Show();
         });
         mainMenuButon.onClick.AddListener(() =>
         {

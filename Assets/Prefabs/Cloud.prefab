@@ -81,12 +81,12 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: cf180bf5f7cfd4642867b4807e8231e4, type: 3}
+  m_Sprite: {fileID: 8042682606269364211, guid: 8d95dbd2a6995464081d5927de428172, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.68, y: 0.72}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -173,6 +173,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d5f554db7d00cb48b4eb9f4434e8845, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WindForce
-  audioSource: {fileID: 0}
   direction: {x: 0, y: 1}
   strength: 5

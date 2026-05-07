@@ -5,6 +5,7 @@
 [Bb]uilds/
 [Ll]ogs/
 UserSettings/
+Builds/
 
 *.csproj
 *.sln
