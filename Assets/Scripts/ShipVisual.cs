@@ -37,6 +37,7 @@ public class ShipVisual : MonoBehaviour
             case PlayerMovement.LandingType.WrongLandingArea:
                 Instantiate(landerVfx, transform.position, Quaternion.identity);
                 gameObject.SetActive(false);
+                CinemachineCameraShake.Instance.ShakeCamera(8f,  0.25f);
                 break;
 
         }

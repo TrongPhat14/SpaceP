@@ -130,6 +130,8 @@ GameObject:
   - component: {fileID: 34383901}
   - component: {fileID: 34383900}
   - component: {fileID: 34383902}
+  - component: {fileID: 34383903}
+  - component: {fileID: 34383904}
   m_Layer: 0
   m_Name: CinemachineCamera
   m_TagString: Untagged
@@ -162,7 +164,7 @@ MonoBehaviour:
     CustomLookAtTarget: 0
   Lens:
     FieldOfView: 34
-    OrthographicSize: 10.00001
+    OrthographicSize: 10.4
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
@@ -226,6 +228,35 @@ MonoBehaviour:
     Time: 0
     Smoothing: 0
     IgnoreY: 0
+--- !u!114 &34383903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 34383899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68bb026fafb42b14791938953eaace77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineBasicMultiChannelPerlin
+  NoiseProfile: {fileID: 11400000, guid: 69ce8388f6785dd4c8c39915efece2f4, type: 2}
+  PivotOffset: {x: 0, y: 0, z: 0}
+  AmplitudeGain: 0
+  FrequencyGain: 5
+  m_NoiseOffsets: {x: -123.69119, y: -861.1217, z: -81.31372}
+--- !u!114 &34383904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 34383899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acca1cb17441c1c4ab12f551371214a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CinemachineCameraShake
 --- !u!1 &40429723
 GameObject:
   m_ObjectHideFlags: 0
@@ -1591,7 +1622,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 10.00001
+  orthographic size: 10.4
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -2885,7 +2916,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &948228169
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3414,7 +3445,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1238903822
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3668,7 +3699,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1432734847
 RectTransform:
   m_ObjectHideFlags: 0
