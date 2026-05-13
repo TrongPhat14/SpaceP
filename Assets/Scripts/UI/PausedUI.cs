@@ -24,7 +24,7 @@ public class PausedUI : MonoBehaviour
             musicVolumeTextMesh.text = "MUSIC " + MusicManager.Instance.GetMusicVolume();
         });
         resumeButon.onClick.AddListener(() => {
-            GameManager.instance.UnPauseGame();
+            GameManager.Instance.UnPauseGame();
         });
         mainMenuButon.onClick.AddListener(() =>
         {
@@ -35,8 +35,8 @@ public class PausedUI : MonoBehaviour
     private void Start()
     {
 
-        GameManager.instance.OnGamePaused += GameManager_OnGamePaused;
-        GameManager.instance.OnGameUnPaused += GameManager_OnGameUnPaused;
+        GameManager.Instance.OnGamePaused += GameManager_OnGamePaused;
+        GameManager.Instance.OnGameUnPaused += GameManager_OnGameUnPaused;
 
         musicVolumeTextMesh.text = "MUSIC " + MusicManager.Instance.GetMusicVolume();
         soundVolumeTextMesh.text = "SOUND " + SoundManager.Instance.GetSoundVolume();

@@ -38,14 +38,14 @@ public class LandedUI : MonoBehaviour
         {
             titleTextMesh.text = "SUCCESSFUL LANDING!";
             nextButtonTextMexh.text = "NEXT LEVEL";
-            nextButtonClickAction = GameManager.instance.NextLevel;
+            nextButtonClickAction = GameManager.Instance.NextLevel;
 
         }
         else
         {
             titleTextMesh.text = "<color=#ff0000>CRASH!</color>";
             nextButtonTextMexh.text = "RESTART";
-            nextButtonClickAction = GameManager.instance.RetryLevel;
+            nextButtonClickAction = GameManager.Instance.RetryLevel;
 
         }
 

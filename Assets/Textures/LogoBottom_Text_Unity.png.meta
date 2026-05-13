@@ -1,0 +1,193 @@
+fileFormatVersion: 2
+guid: 385b064829df6754daeecc4f5b773d9b
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2410903181973291916
+    second: LogoBottom_Text_Unity_0
+  - first:
+      213: -2149579281943628061
+    second: LogoBottom_Text_Unity_1
+  - first:
+      213: 5579030951980713934
+    second: LogoBottom_Text_Unity_2
+  - first:
+      213: -6739616138614702993
+    second: LogoBottom_Text_Unity_3
+  - first:
+      213: -8822377784978269532
+    second: LogoBottom_Text_Unity_4
+  - first:
+      213: -3099369884168145201
+    second: LogoBottom_Text_Unity_5
+  - first:
+      213: 6249333698452252800
+    second: LogoBottom_Text_Unity_6
+  - first:
+      213: -4370751643774820777
+    second: LogoBottom_Text_Unity_7
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: 0
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: LogoBottom_Text_Unity_2
+      rect:
+        serializedVersion: 2
+        x: 13
+        y: 11
+        width: 1098
+        height: 229
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ec748b38713bc6d40800000000000000
+      internalID: 5579030951980713934
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline:
+    - - {x: -556, y: -150}
+      - {x: 557, y: -135}
+      - {x: 554, y: -51.62558}
+      - {x: 554, y: 36}
+      - {x: -545, y: 32}
+    - - {x: -218, y: -1}
+      - {x: -183, y: -1}
+      - {x: -183, y: -1}
+      - {x: -218, y: -1}
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: b4ff072a75c4f824fa21bdab4991d086
+    internalID: -1092197953
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      LogoBottom_Text_Unity_0: 2410903181973291916
+      LogoBottom_Text_Unity_1: -2149579281943628061
+      LogoBottom_Text_Unity_2: 5579030951980713934
+      LogoBottom_Text_Unity_3: -6739616138614702993
+      LogoBottom_Text_Unity_4: -8822377784978269532
+      LogoBottom_Text_Unity_5: -3099369884168145201
+      LogoBottom_Text_Unity_6: 6249333698452252800
+      LogoBottom_Text_Unity_7: -4370751643774820777
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
