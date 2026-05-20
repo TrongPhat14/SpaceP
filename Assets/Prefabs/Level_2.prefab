@@ -1203,6 +1203,7 @@ MonoBehaviour:
   landerStartPosition: {fileID: 6543056856314686930}
   cameraStartPosition: {fileID: 3408417019720379197}
   zoomOutOrthographicSize: 28
+  completeCoinReward: 200
 --- !u!1 &8425430206908676887
 GameObject:
   m_ObjectHideFlags: 0

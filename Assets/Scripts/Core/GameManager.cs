@@ -10,17 +10,12 @@ public class GameManager : MonoBehaviour
     private static int levelNumber = 1;
     private static int totalScore = 0;
 
-    // COMPLETED ADDED:
-    // Lưu trạng thái hoàn thành game trong runtime.
     private static bool isGameCompleted = false;
 
     public static void ResetStaticData()
     {
         levelNumber = 1;
         totalScore = 0;
-
-        // COMPLETED ADDED:
-        // Khi reset game thì không còn trạng thái completed.
         isGameCompleted = false;
     }
 
@@ -31,19 +26,19 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CinemachineCamera cinemachineCamera;
 
     private int score;
+    private int currentLevelCoins;
     private float time;
     private bool isRunning;
 
-    // SAVE ADDED:
-    // Dùng để tránh việc hạ cánh thành công bị xử lý/save nhiều lần.
     private bool hasLevelCompleted;
+
+    private GameLevel spawnedGameLevel;
+
 
     private void Awake()
     {
         Instance = this;
 
-        // SAVE:
-        // Khi vào GameScene, đọc tiến trình đã lưu.
         LoadSavedProgress();
     }
 
@@ -64,23 +59,16 @@ public class GameManager : MonoBehaviour
 
         levelNumber = saveData.levelNumber;
         totalScore = saveData.totalScore;
-
-        // COMPLETED ADDED:
-        // Đọc trạng thái completed từ save.
         isGameCompleted = saveData.isGameCompleted;
 
         Debug.Log($"Loaded Save: Level {levelNumber}, Total Score {totalScore}, Completed {isGameCompleted}");
     }
 
-    // COMPLETED ADDED:
-    // Giữ hàm cũ để code cũ không bị lỗi.
     public static void SetProgress(int newLevelNumber, int newTotalScore)
     {
         SetProgress(newLevelNumber, newTotalScore, false);
     }
 
-    // COMPLETED ADDED:
-    // Hàm mới có thêm trạng thái completed.
     public static void SetProgress(int newLevelNumber, int newTotalScore, bool newIsGameCompleted)
     {
         levelNumber = newLevelNumber;
@@ -116,9 +104,6 @@ public class GameManager : MonoBehaviour
 
     private void loadCurrentLevel()
     {
-        // COMPLETED ADDED:
-        // Nếu vì lý do nào đó Continue vẫn vào GameScene khi đã completed,
-        // thì chuyển sang GameOverScreen thay vì cố load level.
         if (isGameCompleted)
         {
             Debug.Log("Game already completed. Load GameOverScreen.");
@@ -135,7 +120,9 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        GameLevel spawnedGameLevel = Instantiate(
+        // STORE CHANGED:
+        // Gán vào field spawnedGameLevel thay vì chỉ dùng local variable.
+        spawnedGameLevel = Instantiate(
             gamelevel,
             UnityEngine.Vector3.zero,
             UnityEngine.Quaternion.identity
@@ -163,8 +150,6 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
-    // COMPLETED ADDED:
-    // Kiểm tra một level number có tồn tại trong gameLevelList không.
     private bool HasGameLevel(int checkLevelNumber)
     {
         foreach (GameLevel level in gameLevelList)
@@ -201,15 +186,33 @@ public class GameManager : MonoBehaviour
 
         totalScore += score;
 
-        // COMPLETED ADDED:
-        // Không tăng levelNumber mù quáng nữa.
-        // Trước tiên kiểm tra level tiếp theo có tồn tại không.
+        // STORE ADDED:
+        // Thưởng coin khi hoàn thành màn.
+        // Reward lấy từ GameLevel hiện tại.
+        int rewardCoins = 0;
+
+        if (spawnedGameLevel != null)
+        {
+            rewardCoins = spawnedGameLevel.GetCompleteCoinReward();
+        }
+
+        // STORE FIX CHANGED:
+        // Tổng coin thật sự nhận được sau khi qua màn thành công.
+        // Bao gồm coin nhặt trong màn + coin thưởng hoàn thành level.
+        int totalCoinsEarnedThisLevel = currentLevelCoins + rewardCoins;
+
+        // STORE FIX CHANGED:
+        // Chỉ lúc hoàn thành màn thành công mới cộng vào PlayerCurrency.
+        PlayerCurrency.AddCoins(totalCoinsEarnedThisLevel);
+
+        Debug.Log($"Pickup Coins This Level: {currentLevelCoins}");
+        Debug.Log($"Complete Level Coin Reward: {rewardCoins}");
+        Debug.Log($"Total Coins Earned This Level: {totalCoinsEarnedThisLevel}");
+
         int nextLevelNumber = levelNumber + 1;
 
         if (HasGameLevel(nextLevelNumber))
         {
-            // COMPLETED ADDED:
-            // Còn màn tiếp theo thì save màn tiếp theo.
             levelNumber = nextLevelNumber;
             isGameCompleted = false;
 
@@ -219,9 +222,6 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            // COMPLETED ADDED:
-            // Không có màn tiếp theo.
-            // Đây là hoàn thành game, không save level 4.
             isGameCompleted = true;
 
             SaveManager.SaveProgress(levelNumber, totalScore, isGameCompleted);
@@ -233,6 +233,11 @@ public class GameManager : MonoBehaviour
     private void lander_onCoinPickUp(object sender, EventArgs e)
     {
         AddScore(500);
+
+        int pickupCoinReward = 50;
+        currentLevelCoins += pickupCoinReward;
+
+        Debug.Log($"Current Level Coins: {currentLevelCoins}");
     }
 
     public void AddScore(int addScore)
@@ -256,8 +261,6 @@ public class GameManager : MonoBehaviour
         return totalScore;
     }
 
-    // COMPLETED ADDED:
-    // Cho UI khác đọc trạng thái completed nếu cần.
     public bool IsGameCompleted()
     {
         return isGameCompleted;
@@ -265,8 +268,6 @@ public class GameManager : MonoBehaviour
 
     public void NextLevel()
     {
-        // COMPLETED ADDED:
-        // Nếu đã hoàn thành game thì NextLevel đi tới GameOverScreen.
         if (isGameCompleted)
         {
             SceneLoader.LoadScene(SceneLoader.Scene.GameOverScreen);

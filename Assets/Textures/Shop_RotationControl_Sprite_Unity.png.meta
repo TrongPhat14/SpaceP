@@ -1,17 +1,10 @@
 fileFormatVersion: 2
-guid: 3b7030ba65a643345b72f90b10204b63
-AssetOrigin:
-  serializedVersion: 1
-  productId: 298577
-  packageName: Space Game GUI kit
-  packageVersion: 1.0
-  assetPath: Assets/Space_Exploration_GUI_Kit/Picto_Icons/White/left-arrow-128.png
-  uploadId: 700894
+guid: 53e60ef45bb383f49bdd62182d7ec1c8
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3938828210708065104
-    second: left-arrow-128_0
+      213: -4682611878029616623
+    second: Shop_RotationControl_Sprite_Unity_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -53,17 +46,17 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
-  spriteBorder: {x: 22, y: 34, z: 67, w: 35}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
-  spriteTessellationDetail: 0
+  spriteTessellationDetail: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -120,44 +113,33 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: left-arrow-128_0
+      name: Shop_RotationControl_Sprite_Unity_0
       rect:
         serializedVersion: 2
-        x: 22
-        y: 33
-        width: 85
-        height: 62
+        x: 11
+        y: 11
+        width: 939
+        height: 982
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 0b455757c987659c0800000000000000
-      internalID: -3938828210708065104
+      spriteID: 11a15057e45040fb0800000000000000
+      internalID: -4682611878029616623
       vertices: []
       indices: 
       edges: []
       weights: []
-    outline:
-    - - {x: -42, y: -30}
-      - {x: -3, y: -30}
-      - {x: -3, y: -18}
-      - {x: -30, y: 0}
-      - {x: -3, y: 19}
-      - {x: -3, y: 33}
-      - {x: -42, y: 33}
-    - - {x: -32, y: -2}
-      - {x: 49, y: -2}
-      - {x: 49, y: 3}
-      - {x: -32, y: 3}
+    outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
-    internalID: 1537655665
+    spriteID: 
+    internalID: 0
     vertices: []
     indices: 
     edges: []
@@ -166,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      left-arrow-128_0: -3938828210708065104
+      Shop_RotationControl_Sprite_Unity_0: -4682611878029616623
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

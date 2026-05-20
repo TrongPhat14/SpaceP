@@ -52,14 +52,16 @@ public class PlayerMovement : MonoBehaviour
     private float fuelAmountMax = 10f;
     private State state;
 
-    // FIX ADDED:
-    // Dùng để chặn xử lý landing nhiều lần.
-    // Nếu tàu đã success/fail rồi thì các va chạm sau sẽ bị bỏ qua.
     private bool hasLandingResult;
 
     private void Awake()
     {
         instance = this;
+
+        // STORE CHANGED:
+        // Fuel max lấy từ UpgradeManager thay vì hardcode 10f.
+        fuelAmountMax = UpgradeManager.GetFuelAmountMax();
+
         fuelAmount = fuelAmountMax;
         state = State.WaitingToStart;
 
@@ -67,8 +69,6 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
 
-        // FIX ADDED:
-        // Mỗi lần scene load lại thì cho phép xử lý landing mới.
         hasLandingResult = false;
     }
 
@@ -110,22 +110,31 @@ public class PlayerMovement : MonoBehaviour
                 if (GameInput.Instance.IsUpActionPressed() ||
                     GameInput.Instance.GetMovementInputVector2().y > gamePadDeadZone)
                 {
-                    float force = 700f;
+                    // STORE CHANGED:
+                    // Engine force lấy từ UpgradeManager.
+                    float force = UpgradeManager.GetEngineForce();
+
                     rb.AddForce(force * transform.up * Time.deltaTime);
                     onUpForce?.Invoke(this, EventArgs.Empty);
                 }
 
                 if (GameInput.Instance.IsLeftActionPressed())
                 {
-                    float turnSpeed = +100f;
-                    rb.AddTorque(turnSpeed * Time.deltaTime);
+                    // STORE CHANGED:
+                    // Turn speed lấy từ UpgradeManager.
+                    float turnSpeed = UpgradeManager.GetTurnSpeed();
+
+                    rb.AddTorque(+turnSpeed * Time.deltaTime);
                     onLeftForce?.Invoke(this, EventArgs.Empty);
                 }
 
                 if (GameInput.Instance.IsRightActionPressed())
                 {
-                    float turnSpeed = -100f;
-                    rb.AddTorque(turnSpeed * Time.deltaTime);
+                    // STORE CHANGED:
+                    // Turn speed lấy từ UpgradeManager.
+                    float turnSpeed = UpgradeManager.GetTurnSpeed();
+
+                    rb.AddTorque(-turnSpeed * Time.deltaTime);
                     onRightForce?.Invoke(this, EventArgs.Empty);
                 }
                 break;
@@ -137,9 +146,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // FIX ADDED:
-        // Nếu đã có kết quả landing rồi thì bỏ qua mọi va chạm sau.
-        // Tránh case hạ cánh thành công xong tàu rớt khỏi mép và báo fail.
         if (hasLandingResult)
         {
             return;
@@ -149,8 +155,6 @@ public class PlayerMovement : MonoBehaviour
         {
             Debug.Log("Crashed on the Terrain");
 
-            // FIX ADDED:
-            // Đã có kết quả thất bại, không cho xử lý va chạm thêm.
             hasLandingResult = true;
 
             onLanded?.Invoke(this, new OnLandedEventArgs
@@ -166,15 +170,16 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        float softLandingVelocityMagnitude = 4f;
+        // STORE CHANGED:
+        // Tốc độ hạ cánh cho phép lấy từ Landing Stabilizer upgrade.
+        float softLandingVelocityMagnitude = UpgradeManager.GetSoftLandingVelocityMagnitude();
+
         float relaticeVelocityMagnitude = collision.relativeVelocity.magnitude;
 
         if (relaticeVelocityMagnitude > softLandingVelocityMagnitude)
         {
             Debug.Log("Landed was high");
 
-            // FIX ADDED:
-            // Đã có kết quả thất bại, không cho xử lý va chạm thêm.
             hasLandingResult = true;
 
             onLanded?.Invoke(this, new OnLandedEventArgs
@@ -191,14 +196,15 @@ public class PlayerMovement : MonoBehaviour
         }
 
         float dotVector = Vector2.Dot(Vector2.up, transform.up);
-        float minDotVector = .90f;
+
+        // STORE CHANGED:
+        // Góc hạ cánh cho phép lấy từ Landing Stabilizer upgrade.
+        float minDotVector = UpgradeManager.GetMinLandingDotVector();
 
         if (dotVector < minDotVector)
         {
             Debug.Log("Landed on a too steep angle");
 
-            // FIX ADDED:
-            // Đã có kết quả thất bại, không cho xử lý va chạm thêm.
             hasLandingResult = true;
 
             onLanded?.Invoke(this, new OnLandedEventArgs
@@ -230,13 +236,8 @@ public class PlayerMovement : MonoBehaviour
 
         Debug.Log("Score :" + score);
 
-        // FIX ADDED:
-        // Đánh dấu đã hạ cánh thành công trước khi gọi event.
-        // Từ thời điểm này mọi va chạm sau sẽ bị bỏ qua.
         hasLandingResult = true;
 
-        // FIX ADDED:
-        // Dừng tàu lại để nó không tiếp tục rơi khỏi mép LandingPlace.
         StopLanderAfterSuccessLanding();
 
         onLanded?.Invoke(this, new OnLandedEventArgs
@@ -253,8 +254,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // FIX ADDED:
-        // Sau khi đã success/fail thì không ăn thêm coin/fuel nữa.
         if (hasLandingResult)
         {
             return;
@@ -283,8 +282,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        // FIX ADDED:
-        // Sau khi đã success/fail thì không còn bị WindForce đẩy nữa.
         if (hasLandingResult)
         {
             return;
@@ -297,8 +294,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // FIX ADDED:
-    // Dừng toàn bộ physics sau khi hạ cánh thành công.
     private void StopLanderAfterSuccessLanding()
     {
         rb.linearVelocity = Vector2.zero;

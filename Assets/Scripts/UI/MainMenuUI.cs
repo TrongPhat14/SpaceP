@@ -9,10 +9,16 @@ public class MainMenuUI : MonoBehaviour
 
     [Header("Buttons")]
     [SerializeField] private Button playButton;
+
+    [SerializeField] private Button storeButton;
+
     [SerializeField] private Button quitButton;
 
     [Header("Selected Frames")]
     [SerializeField] private GameObject playSelectedFrame;
+
+    [SerializeField] private GameObject storeSelectedFrame;
+
     [SerializeField] private GameObject quitSelectedFrame;
 
     private void Awake()
@@ -22,6 +28,11 @@ public class MainMenuUI : MonoBehaviour
         playButton.onClick.AddListener(() =>
         {
             OnClickPlay();
+        });
+
+        storeButton.onClick.AddListener(() =>
+        {
+            SceneLoader.LoadScene(SceneLoader.Scene.StoreScreen);
         });
 
         quitButton.onClick.AddListener(() =>
@@ -82,6 +93,9 @@ public class MainMenuUI : MonoBehaviour
         GameObject selectedObject = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
 
         playSelectedFrame.SetActive(selectedObject == playButton.gameObject);
+
+        storeSelectedFrame.SetActive(selectedObject == storeButton.gameObject);
+
         quitSelectedFrame.SetActive(selectedObject == quitButton.gameObject);
     }
 }

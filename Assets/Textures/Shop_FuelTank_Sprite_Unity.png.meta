@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 4f7e47437f2a6b14c81d4556a35b3134
+guid: 6e173be6994ba5e41ad09223f199a14e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3407422659470596188
-    second: home-background-medium_0
+      213: -5333403431625844378
+    second: Shop_FuelTank_Sprite_Unity_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -70,7 +70,7 @@ TextureImporter:
   swizzle: 50462976
   cookieLightType: 0
   platformSettings:
-  - serializedVersion: 3
+  - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -83,8 +83,21 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
+  - serializedVersion: 4
     buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -100,27 +113,29 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: home-background-medium_0
+      name: Shop_FuelTank_Sprite_Unity_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 960
-        height: 540
+        x: 11
+        y: 11
+        width: 363
+        height: 1013
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 4a763aef42766b0d0800000000000000
-      internalID: -3407422659470596188
+      spriteID: 669971626d1fbf5b0800000000000000
+      internalID: -5333403431625844378
       vertices: []
       indices: 
       edges: []
       weights: []
     outline: []
+    customData: 
     physicsShape: []
     bones: []
     spriteID: 
@@ -130,17 +145,12 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
     nameFileIdTable:
-      home-background-medium_0: -3407422659470596188
+      Shop_FuelTank_Sprite_Unity_0: -5333403431625844378
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 298577
-  packageName: Space Game GUI kit
-  packageVersion: 1.0
-  assetPath: Assets/Space_Exploration_GUI_Kit/Background_Images/medium/home-background-medium.png
-  uploadId: 700894

@@ -8,6 +8,7 @@ public static class SceneLoader
         MainMenuScreen,
         GameScene,
         GameOverScreen,
+        StoreScreen,
     }
 
     public static void LoadScene(Scene scene)
