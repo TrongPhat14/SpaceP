@@ -11,10 +11,10 @@ public class ShipVisual : MonoBehaviour
 
     private void Awake()
     {
-        PlayerMovement.instance.onUpForce += lander_OnUpForce ;
-        PlayerMovement.instance.onLeftForce += lander_OnLeftForce;
-        PlayerMovement.instance.onRightForce += lander_OnRightForce;
-        PlayerMovement.instance.onBeforeForce += lander_OnBeforeForce;
+        PlayerMovement.Instance.onUpForce += lander_OnUpForce ;
+        PlayerMovement.Instance.onLeftForce += lander_OnLeftForce;
+        PlayerMovement.Instance.onRightForce += lander_OnRightForce;
+        PlayerMovement.Instance.onBeforeForce += lander_OnBeforeForce;
 
         SetEnabledThrusterPaticleSystem(middleThrusterParticleSystem, false);
         SetEnabledThrusterPaticleSystem(leftThrusterParticleSystem, false);
@@ -25,7 +25,7 @@ public class ShipVisual : MonoBehaviour
 
     private void Start()
     {
-        PlayerMovement.instance.onLanded += Lander_onLanded;
+        PlayerMovement.Instance.onLanded += Lander_onLanded;
     }
 
     private void Lander_onLanded(object sender, PlayerMovement.OnLandedEventArgs e)

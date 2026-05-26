@@ -6,8 +6,9 @@ public class ShopItemData : ScriptableObject
     [Header("Item Info")]
     public string itemId;
     public string itemName;
+
     [TextArea] public string description;
-    public Sprite icon;
+
 
     [Header("Upgrade")]
     public UpgradeType upgradeType;

@@ -129,7 +129,7 @@ public class StoreUI : MonoBehaviour
         ShopItemData itemData = itemUI.itemData;
 
         int currentLevel = UpgradeManager.GetUpgradeLevel(itemData.upgradeType);
-        bool isMaxLevel = currentLevel >= itemData.maxLevel;
+        bool isMaxLevel = UpgradeManager.IsMaxLevel(itemData);
 
         RefreshStaticText(itemUI, itemData);
         RefreshLevel(itemUI, currentLevel, itemData.maxLevel, isMaxLevel);
@@ -140,10 +140,6 @@ public class StoreUI : MonoBehaviour
 
     private void RefreshStaticText(StoreItemUI itemUI, ShopItemData itemData)
     {
-        // STORE NOTE:
-        // Nếu bạn đã tự ghi text trong Hierarchy thì có thể không gán nameText/descriptionText.
-        // Nếu có gán, code sẽ tự fill từ ScriptableObject.
-
         if (itemUI.nameText != null)
         {
             itemUI.nameText.text = itemData.itemName;
@@ -193,8 +189,6 @@ public class StoreUI : MonoBehaviour
             itemUI.nextMainValueText.text = UpgradeManager.GetNextStatText(itemData);
         }
 
-        // STORE NOTE:
-        // Max level thì không còn cấp tiếp theo, nên ẩn Next và mũi tên.
         SetActive(itemUI.nextMainGroup, !isMaxLevel);
         SetActive(itemUI.nextArrowObject, !isMaxLevel);
     }
@@ -203,8 +197,6 @@ public class StoreUI : MonoBehaviour
     {
         bool isLandingStabilizer = itemData.upgradeType == UpgradeType.LandingStabilizer;
 
-        // STORE NOTE:
-        // Chỉ Landing Stabilizer mới có stat thứ 2: Angle.
         SetActive(itemUI.secondStatGroup, isLandingStabilizer);
 
         if (!isLandingStabilizer)
@@ -234,8 +226,6 @@ public class StoreUI : MonoBehaviour
             itemUI.nextSecondValueText.text = UpgradeManager.GetLandingAngleNextText(itemData);
         }
 
-        // STORE NOTE:
-        // Max level thì ẩn riêng phần Next Angle.
         SetActive(itemUI.nextSecondGroup, !isMaxLevel);
     }
 

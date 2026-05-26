@@ -44,9 +44,9 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        PlayerMovement.instance.onCoinPickUp += lander_onCoinPickUp;
-        PlayerMovement.instance.onLanded += Lander_onLanded;
-        PlayerMovement.instance.onStateChange += Lander_onStateChange;
+        PlayerMovement.Instance.onCoinPickUp += lander_onCoinPickUp;
+        PlayerMovement.Instance.onLanded += Lander_onLanded;
+        PlayerMovement.Instance.onStateChange += Lander_onStateChange;
 
         GameInput.Instance.OnMenuButtonPressed += GameInput_OnMenuButtonPressed;
 
@@ -63,8 +63,8 @@ public class GameManager : MonoBehaviour
 
         Debug.Log($"Loaded Save: Level {levelNumber}, Total Score {totalScore}, Completed {isGameCompleted}");
     }
-
-    public static void SetProgress(int newLevelNumber, int newTotalScore)
+    // Test level game
+/*    public static void SetProgress(int newLevelNumber, int newTotalScore)
     {
         SetProgress(newLevelNumber, newTotalScore, false);
     }
@@ -76,7 +76,7 @@ public class GameManager : MonoBehaviour
         isGameCompleted = newIsGameCompleted;
 
         SaveManager.SaveProgress(levelNumber, totalScore, isGameCompleted);
-    }
+    }*/
 
     private void GameInput_OnMenuButtonPressed(object sender, EventArgs e)
     {
@@ -89,7 +89,7 @@ public class GameManager : MonoBehaviour
 
         if (e.State == PlayerMovement.State.Normal)
         {
-            cinemachineCamera.Target.TrackingTarget = PlayerMovement.instance.transform;
+            cinemachineCamera.Target.TrackingTarget = PlayerMovement.Instance.transform;
             CinemachineCameraZoom.Instance.SetNormalOrthographicSize();
         }
     }
@@ -120,15 +120,13 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // STORE CHANGED:
-        // Gán vào field spawnedGameLevel thay vì chỉ dùng local variable.
         spawnedGameLevel = Instantiate(
             gamelevel,
             UnityEngine.Vector3.zero,
             UnityEngine.Quaternion.identity
         );
 
-        PlayerMovement.instance.transform.position = spawnedGameLevel.GetLanderStartPosition();
+        PlayerMovement.Instance.transform.position = spawnedGameLevel.GetLanderStartPosition();
 
         cinemachineCamera.Target.TrackingTarget = spawnedGameLevel.GetCameraStartTargetTransform();
 
@@ -186,9 +184,6 @@ public class GameManager : MonoBehaviour
 
         totalScore += score;
 
-        // STORE ADDED:
-        // Thưởng coin khi hoàn thành màn.
-        // Reward lấy từ GameLevel hiện tại.
         int rewardCoins = 0;
 
         if (spawnedGameLevel != null)
@@ -196,13 +191,8 @@ public class GameManager : MonoBehaviour
             rewardCoins = spawnedGameLevel.GetCompleteCoinReward();
         }
 
-        // STORE FIX CHANGED:
-        // Tổng coin thật sự nhận được sau khi qua màn thành công.
-        // Bao gồm coin nhặt trong màn + coin thưởng hoàn thành level.
         int totalCoinsEarnedThisLevel = currentLevelCoins + rewardCoins;
 
-        // STORE FIX CHANGED:
-        // Chỉ lúc hoàn thành màn thành công mới cộng vào PlayerCurrency.
         PlayerCurrency.AddCoins(totalCoinsEarnedThisLevel);
 
         Debug.Log($"Pickup Coins This Level: {currentLevelCoins}");
@@ -259,11 +249,6 @@ public class GameManager : MonoBehaviour
     public int GetTotalScore()
     {
         return totalScore;
-    }
-
-    public bool IsGameCompleted()
-    {
-        return isGameCompleted;
     }
 
     public void NextLevel()

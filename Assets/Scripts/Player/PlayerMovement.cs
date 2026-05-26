@@ -6,7 +6,7 @@ public class PlayerMovement : MonoBehaviour
 {
     private const float GRAVITY_NORMAL = 0.7f;
 
-    public static PlayerMovement instance { get; private set; }
+    public static PlayerMovement Instance { get; private set; }
 
     public event EventHandler onUpForce;
     public event EventHandler onLeftForce;
@@ -56,7 +56,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Awake()
     {
-        instance = this;
+        Instance = this;
 
         // STORE CHANGED:
         // Fuel max lấy từ UpgradeManager thay vì hardcode 10f.
@@ -76,6 +76,8 @@ public class PlayerMovement : MonoBehaviour
     {
         onBeforeForce?.Invoke(this, EventArgs.Empty);
 
+        Vector2 movementInput = GameInput.Instance.GetMovementInputVector2();
+
         switch (state)
         {
             default:
@@ -83,7 +85,7 @@ public class PlayerMovement : MonoBehaviour
                 if (GameInput.Instance.IsUpActionPressed() ||
                     GameInput.Instance.IsRightActionPressed() ||
                     GameInput.Instance.IsLeftActionPressed() ||
-                    GameInput.Instance.GetMovementInputVector2() != Vector2.zero)
+                    movementInput != Vector2.zero)
                 {
                     ConsumeFuel();
                     rb.gravityScale = GRAVITY_NORMAL;
@@ -100,7 +102,7 @@ public class PlayerMovement : MonoBehaviour
                 if (GameInput.Instance.IsUpActionPressed() ||
                     GameInput.Instance.IsRightActionPressed() ||
                     GameInput.Instance.IsLeftActionPressed() ||
-                    GameInput.Instance.GetMovementInputVector2() != Vector2.zero)
+                    movementInput != Vector2.zero)
                 {
                     ConsumeFuel();
                 }
@@ -108,32 +110,25 @@ public class PlayerMovement : MonoBehaviour
                 float gamePadDeadZone = .4f;
 
                 if (GameInput.Instance.IsUpActionPressed() ||
-                    GameInput.Instance.GetMovementInputVector2().y > gamePadDeadZone)
+                    movementInput.y > gamePadDeadZone)
                 {
-                    // STORE CHANGED:
-                    // Engine force lấy từ UpgradeManager.
                     float force = UpgradeManager.GetEngineForce();
-
                     rb.AddForce(force * transform.up * Time.deltaTime);
                     onUpForce?.Invoke(this, EventArgs.Empty);
                 }
 
-                if (GameInput.Instance.IsLeftActionPressed())
+                if (GameInput.Instance.IsLeftActionPressed() ||
+                    movementInput.x < -gamePadDeadZone)
                 {
-                    // STORE CHANGED:
-                    // Turn speed lấy từ UpgradeManager.
                     float turnSpeed = UpgradeManager.GetTurnSpeed();
-
                     rb.AddTorque(+turnSpeed * Time.deltaTime);
                     onLeftForce?.Invoke(this, EventArgs.Empty);
                 }
 
-                if (GameInput.Instance.IsRightActionPressed())
+                if (GameInput.Instance.IsRightActionPressed() ||
+                    movementInput.x > gamePadDeadZone)
                 {
-                    // STORE CHANGED:
-                    // Turn speed lấy từ UpgradeManager.
                     float turnSpeed = UpgradeManager.GetTurnSpeed();
-
                     rb.AddTorque(-turnSpeed * Time.deltaTime);
                     onRightForce?.Invoke(this, EventArgs.Empty);
                 }
@@ -170,8 +165,6 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        // STORE CHANGED:
-        // Tốc độ hạ cánh cho phép lấy từ Landing Stabilizer upgrade.
         float softLandingVelocityMagnitude = UpgradeManager.GetSoftLandingVelocityMagnitude();
 
         float relaticeVelocityMagnitude = collision.relativeVelocity.magnitude;
@@ -197,8 +190,6 @@ public class PlayerMovement : MonoBehaviour
 
         float dotVector = Vector2.Dot(Vector2.up, transform.up);
 
-        // STORE CHANGED:
-        // Góc hạ cánh cho phép lấy từ Landing Stabilizer upgrade.
         float minDotVector = UpgradeManager.GetMinLandingDotVector();
 
         if (dotVector < minDotVector)

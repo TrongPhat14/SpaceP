@@ -11,6 +11,7 @@ public class SaveUI : MonoBehaviour
     [Header("Texts")]
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI totalScoreText;
+    [SerializeField] private TextMeshProUGUI continueButtonText;
 
     [Header("Buttons")]
     [SerializeField] private Button continueButton;
@@ -21,6 +22,9 @@ public class SaveUI : MonoBehaviour
     [SerializeField] private GameObject continueSelectedFrame;
     [SerializeField] private GameObject newGameSelectedFrame;
     [SerializeField] private GameObject backSelectedFrame;
+
+    private bool saveIsCompleted;
+    private bool completedScoreSubmitted;
 
     private void Awake()
     {
@@ -67,8 +71,10 @@ public class SaveUI : MonoBehaviour
     private void UpdateSaveText()
     {
         SaveData saveData = SaveManager.LoadProgress();
+        saveIsCompleted = saveData.isGameCompleted;
+        completedScoreSubmitted = LeaderboardManager.HasSubmittedCompletedGameScore(saveData);
 
-        if (saveData.isGameCompleted)
+        if (saveIsCompleted)
         {
             levelText.text = "COMPLETED";
         }
@@ -78,9 +84,37 @@ public class SaveUI : MonoBehaviour
         }
 
         totalScoreText.text = saveData.totalScore.ToString();
+
+        continueButton.interactable = true;
+
+        if (continueButtonText != null)
+        {
+            if (!saveIsCompleted)
+            {
+                continueButtonText.text = "CONTINUE";
+            }
+            else if (completedScoreSubmitted)
+            {
+                continueButtonText.text = "LEADERBOARD";
+            }
+            else
+            {
+                continueButtonText.text = "SUBMIT SCORE";
+            }
+        }
     }
     private void OnClickContinue()
     {
+        if (saveIsCompleted)
+        {
+            SceneLoader.LoadScene(
+                completedScoreSubmitted
+                    ? SceneLoader.Scene.LeaderboardScreen
+                    : SceneLoader.Scene.GameOverScreen
+            );
+            return;
+        }
+
         SceneLoader.LoadScene(SceneLoader.Scene.GameScene);
     }
 
@@ -89,6 +123,7 @@ public class SaveUI : MonoBehaviour
         GameManager.ResetStaticData();
 
         SaveManager.ResetProgress();
+        LeaderboardManager.ClearSubmittedCompletedScore();
 
         SceneLoader.LoadScene(SceneLoader.Scene.GameScene);
     }

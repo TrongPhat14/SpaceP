@@ -55,18 +55,6 @@ public static class UpgradeManager
         return currentLevel >= itemData.maxLevel;
     }
 
-    public static int GetUpgradePrice(ShopItemData itemData)
-    {
-        int currentLevel = GetUpgradeLevel(itemData.upgradeType);
-
-        if (currentLevel >= itemData.maxLevel)
-        {
-            return 0;
-        }
-
-        return itemData.GetPrice(currentLevel);
-    }
-
     public static bool TryUpgrade(ShopItemData itemData)
     {
         EnsureLoaded();
@@ -137,55 +125,36 @@ public static class UpgradeManager
         EnsureLoaded();
     }
 
-    // GAMEPLAY STATS:
-
     public static float GetFuelAmountMax()
     {
         EnsureLoaded();
-
-        // STORE STAT:
-        // Lv0 = 10, Lv1 = 12, Lv2 = 14, Lv3 = 16
         return GetFuelAmountMaxByLevel(fuelTankLevel);
     }
 
     public static float GetEngineForce()
     {
         EnsureLoaded();
-
-        // STORE STAT:
-        // Lv0 = 700, Lv1 = 750, Lv2 = 800, Lv3 = 850
         return GetEngineForceByLevel(enginePowerLevel);
     }
 
     public static float GetTurnSpeed()
     {
         EnsureLoaded();
-
-        // STORE STAT:
-        // Lv0 = 100, Lv1 = 115, Lv2 = 130, Lv3 = 145
         return GetTurnSpeedByLevel(rotationControlLevel);
     }
 
     public static float GetSoftLandingVelocityMagnitude()
     {
         EnsureLoaded();
-
-        // STORE STAT:
-        // Lv0 = 4.0, Lv1 = 4.3, Lv2 = 4.6, Lv3 = 4.9
         return GetSoftLandingVelocityMagnitudeByLevel(landingStabilizerLevel);
     }
 
     public static float GetMinLandingDotVector()
     {
         EnsureLoaded();
-
-        // STORE STAT:
-        // Lv0 = 0.90, Lv1 = 0.88, Lv2 = 0.86, Lv3 = 0.84
         return GetMinLandingDotVectorByLevel(landingStabilizerLevel);
     }
 
-    // STORE ADDED:
-    // Các hàm dưới dùng cho StoreUI để lấy chỉ số hiện tại và chỉ số cấp tiếp theo.
 
     public static float GetFuelAmountMaxByLevel(int level)
     {
@@ -211,40 +180,12 @@ public static class UpgradeManager
     {
         return 0.90f - level * 0.02f;
     }
-
-    // STORE ADDED:
-    // Lấy tên chỉ số để hiện trên Store UI.
-    public static string GetStatName(UpgradeType upgradeType)
-    {
-        switch (upgradeType)
-        {
-            case UpgradeType.FuelTank:
-                return "FUEL";
-
-            case UpgradeType.EnginePower:
-                return "POWER";
-
-            case UpgradeType.RotationControl:
-                return "TURN";
-
-            case UpgradeType.LandingStabilizer:
-                return "SAFE SPD";
-
-            default:
-                return "STAT";
-        }
-    }
-
-    // STORE ADDED:
-    // Lấy chỉ số chính hiện tại theo level.
     public static string GetCurrentStatText(UpgradeType upgradeType)
     {
         int currentLevel = GetUpgradeLevel(upgradeType);
         return GetStatTextByLevel(upgradeType, currentLevel);
     }
 
-    // STORE ADDED:
-    // Lấy chỉ số cấp tiếp theo.
     public static string GetNextStatText(ShopItemData itemData)
     {
         int currentLevel = GetUpgradeLevel(itemData.upgradeType);
@@ -279,8 +220,6 @@ public static class UpgradeManager
         }
     }
 
-    // STORE ADDED:
-    // Landing Stabilizer có thêm chỉ số phụ là angle.
     public static string GetLandingAngleCurrentText()
     {
         int currentLevel = GetUpgradeLevel(UpgradeType.LandingStabilizer);

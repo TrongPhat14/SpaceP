@@ -12,12 +12,16 @@ public class MainMenuUI : MonoBehaviour
 
     [SerializeField] private Button storeButton;
 
+    [SerializeField] private Button leaderboardButton;
+
     [SerializeField] private Button quitButton;
 
     [Header("Selected Frames")]
     [SerializeField] private GameObject playSelectedFrame;
 
     [SerializeField] private GameObject storeSelectedFrame;
+
+    [SerializeField] private GameObject leaderBoardSelectedFrame;
 
     [SerializeField] private GameObject quitSelectedFrame;
 
@@ -34,6 +38,14 @@ public class MainMenuUI : MonoBehaviour
         {
             SceneLoader.LoadScene(SceneLoader.Scene.StoreScreen);
         });
+
+        if (leaderboardButton != null)
+        {
+            leaderboardButton.onClick.AddListener(() =>
+            {
+                SceneLoader.LoadScene(SceneLoader.Scene.LeaderboardScreen);
+            });
+        }
 
         quitButton.onClick.AddListener(() =>
         {
@@ -72,6 +84,7 @@ public class MainMenuUI : MonoBehaviour
         GameManager.ResetStaticData();
 
         SaveManager.ResetProgress();
+        LeaderboardManager.ClearSubmittedCompletedScore();
 
         SceneLoader.LoadScene(SceneLoader.Scene.GameScene);
     }
@@ -95,6 +108,11 @@ public class MainMenuUI : MonoBehaviour
         playSelectedFrame.SetActive(selectedObject == playButton.gameObject);
 
         storeSelectedFrame.SetActive(selectedObject == storeButton.gameObject);
+
+        if (leaderboardButton != null && leaderBoardSelectedFrame != null)
+        {
+            leaderBoardSelectedFrame.SetActive(selectedObject == leaderboardButton.gameObject);
+        }
 
         quitSelectedFrame.SetActive(selectedObject == quitButton.gameObject);
     }

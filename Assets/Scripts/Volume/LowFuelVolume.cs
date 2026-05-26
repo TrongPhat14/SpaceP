@@ -13,7 +13,7 @@ public class LowFuelVolume : MonoBehaviour
     private void Update()
     {
         float fuel =
-            PlayerMovement.instance.GetFuelAmountNormalized();
+            PlayerMovement.Instance.GetFuelAmountNormalized();
 
         if (fuel < 0.3f)
         {

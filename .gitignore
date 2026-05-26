@@ -19,3 +19,10 @@ UserSettings/
 .vscode/
 .idea/
 .vsconfig
+
+Assets/google-services.json
+Assets/StreamingAssets/google-services-desktop.json
+
+# Firebase macOS native plugins are large and not needed for this Windows/Android project.
+Assets/Firebase/Plugins/x86_64/*.bundle
+Assets/Firebase/Plugins/x86_64/*.bundle.meta

@@ -40,6 +40,8 @@ public static class PlayerCurrency
         Debug.Log($"Add Coins: {amount}, Current Coins: {coins}");
     }
 
+
+    // Use this when you want to change the color of an item but don't have enough money.
     public static bool HasEnoughCoins(int amount)
     {
         EnsureLoaded();
@@ -68,6 +70,7 @@ public static class PlayerCurrency
         return true;
     }
 
+    // Use this when I want to reset the shop.
     public static void Reload()
     {
         isLoaded = false;

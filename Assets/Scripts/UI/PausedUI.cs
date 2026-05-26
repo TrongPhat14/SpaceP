@@ -11,6 +11,12 @@ public class PausedUI : MonoBehaviour
     [SerializeField] private Button musicVolumeButon;
     [SerializeField] private TextMeshProUGUI musicVolumeTextMesh;
 
+    [Header("Selected Frames")]
+    [SerializeField] private GameObject resumeSelectedFrame;
+    [SerializeField] private GameObject mainMenuSelectedFrame;
+    [SerializeField] private GameObject soundVolumeSelectedFrame;
+    [SerializeField] private GameObject musicVolumeSelectedFrame;
+
     private void Awake()
     {
         soundVolumeButon.onClick.AddListener(() =>
@@ -43,6 +49,11 @@ public class PausedUI : MonoBehaviour
         Hide();
     }
 
+    private void Update()
+    {
+        UpdateSelectedFrame();
+    }
+
     private void GameManager_OnGameUnPaused(object sender, System.EventArgs e)
     {
         Hide();
@@ -57,10 +68,34 @@ public class PausedUI : MonoBehaviour
     {
         gameObject.SetActive(true);
         resumeButon.Select();
+        UpdateSelectedFrame();
 
     }
     private void Hide()
     {
         gameObject.SetActive(false);
+    }
+
+    private void UpdateSelectedFrame()
+    {
+        if (!gameObject.activeSelf || UnityEngine.EventSystems.EventSystem.current == null)
+        {
+            return;
+        }
+
+        GameObject selectedObject = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
+
+        SetSelectedFrame(resumeSelectedFrame, selectedObject == resumeButon.gameObject);
+        SetSelectedFrame(mainMenuSelectedFrame, selectedObject == mainMenuButon.gameObject);
+        SetSelectedFrame(soundVolumeSelectedFrame, selectedObject == soundVolumeButon.gameObject);
+        SetSelectedFrame(musicVolumeSelectedFrame, selectedObject == musicVolumeButon.gameObject);
+    }
+
+    private void SetSelectedFrame(GameObject selectedFrame, bool active)
+    {
+        if (selectedFrame != null)
+        {
+            selectedFrame.SetActive(active);
+        }
     }
 }

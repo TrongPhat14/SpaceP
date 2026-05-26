@@ -9,6 +9,7 @@ public static class SceneLoader
         GameScene,
         GameOverScreen,
         StoreScreen,
+        LeaderboardScreen,
     }
 
     public static void LoadScene(Scene scene)

@@ -5,6 +5,7 @@ using System;
 public class SoundManager : MonoBehaviour
 {
     private const int SOUND_VOLUME_MAX = 10;
+    private const float WIND_SOUND_COOLDOWN = 0.5f;
 
     public static SoundManager Instance { get; private set; }
     private static int soundVolume = 6;
@@ -18,16 +19,18 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private AudioClip landedSuccessfullAudioClip;
     [SerializeField] private AudioClip crashAudioClip;
 
+    private float lastWindSoundTime = -WIND_SOUND_COOLDOWN;
+
     private void Awake()
     {
         Instance = this;
     }
     private void Start()
     {
-        PlayerMovement.instance.onCoinPickUp += Player_onCoinPickUp;
-        PlayerMovement.instance.onFuelPickUp += Player_onFuelPickUp;
-        PlayerMovement.instance.onWindForce += Player_onWindForce;
-        PlayerMovement.instance.onLanded += Player_onLanded;
+        PlayerMovement.Instance.onCoinPickUp += Player_onCoinPickUp;
+        PlayerMovement.Instance.onFuelPickUp += Player_onFuelPickUp;
+        PlayerMovement.Instance.onWindForce += Player_onWindForce;
+        PlayerMovement.Instance.onLanded += Player_onLanded;
     }
 
 
@@ -57,6 +60,12 @@ public class SoundManager : MonoBehaviour
     }
     private void Player_onWindForce(object sender, EventArgs e)
     {
+        if (Time.time < lastWindSoundTime + WIND_SOUND_COOLDOWN)
+        {
+            return;
+        }
+
+        lastWindSoundTime = Time.time;
         AudioSource.PlayClipAtPoint(WindAudioClip, Camera.main.transform.position, GetSoundVolumeNormalized());
     }
 

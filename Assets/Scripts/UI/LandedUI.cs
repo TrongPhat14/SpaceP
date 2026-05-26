@@ -22,7 +22,7 @@ public class LandedUI : MonoBehaviour
 
     private void Start()
     {
-        PlayerMovement.instance.onLanded += lander_onLanded;
+        PlayerMovement.Instance.onLanded += lander_onLanded;
 
         nextButton.Select();
         Hide();
