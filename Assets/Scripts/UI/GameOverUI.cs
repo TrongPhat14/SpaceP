@@ -102,17 +102,6 @@ public class GameOverUI : MonoBehaviour
             globalRankValueText.text = alreadySubmitted ? "SUBMITTED" : "ENTER NAME";
         }
 
-        if (canSubmitScore)
-        {
-            FirebaseManager.Initialize((isReady, message) =>
-            {
-                if (isReady)
-                {
-                    AnalyticsManager.LogGameComplete(saveData.totalScore, saveData.levelNumber);
-                }
-            });
-        }
-
         UpdateSubmitAvailability();
     }
 

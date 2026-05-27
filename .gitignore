@@ -5,6 +5,7 @@
 [Bb]uilds/
 [Ll]ogs/
 UserSettings/
+.utmp/
 
 *.csproj
 *.sln
@@ -22,6 +23,8 @@ UserSettings/
 
 Assets/google-services.json
 Assets/StreamingAssets/google-services-desktop.json
+Assets/google-services.json.meta
+Assets/StreamingAssets/google-services-desktop.json.meta
 
 # Firebase macOS native plugins are large and not needed for this Windows/Android project.
 Assets/Firebase/Plugins/x86_64/*.bundle

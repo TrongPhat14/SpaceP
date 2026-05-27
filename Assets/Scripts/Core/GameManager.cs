@@ -133,6 +133,8 @@ public class GameManager : MonoBehaviour
         CinemachineCameraZoom.Instance.SetTargetOrthographicSize(
             spawnedGameLevel.GetZoomOutOrthographicSize()
         );
+
+        AnalyticsManager.LogLevelStart(levelNumber, totalScore);
     }
 
     private GameLevel GetGameLevel()
@@ -165,10 +167,19 @@ public class GameManager : MonoBehaviour
     {
         if (e.landingType != PlayerMovement.LandingType.Success)
         {
+            AnalyticsManager.LogLevelFail(
+                levelNumber,
+                GetLandingFailReason(e.landingType),
+                time,
+                e.speed,
+                e.dotVector * 100f
+            );
             return;
         }
 
         AddScore(e.score);
+
+        AnalyticsManager.LogLevelComplete(levelNumber, score, totalScore + score, time);
 
         CompleteLevelAndSave();
     }
@@ -215,6 +226,7 @@ public class GameManager : MonoBehaviour
             isGameCompleted = true;
 
             SaveManager.SaveProgress(levelNumber, totalScore, isGameCompleted);
+            AnalyticsManager.LogGameComplete(totalScore, levelNumber);
 
             Debug.Log($"Game Completed And Saved: Last Level {levelNumber}, Total Score {totalScore}");
         }
@@ -271,6 +283,7 @@ public class GameManager : MonoBehaviour
 
     public void RetryLevel()
     {
+        AnalyticsManager.LogLevelRetry(levelNumber, time);
         SceneLoader.LoadScene(SceneLoader.Scene.GameScene);
     }
 
@@ -301,5 +314,23 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f;
         OnGameUnPaused?.Invoke(this, EventArgs.Empty);
+    }
+
+    private string GetLandingFailReason(PlayerMovement.LandingType landingType)
+    {
+        switch (landingType)
+        {
+            case PlayerMovement.LandingType.WrongLandingArea:
+                return "wrong_landing_area";
+
+            case PlayerMovement.LandingType.TooSpeedLanding:
+                return "too_fast";
+
+            case PlayerMovement.LandingType.TooSteepAngle:
+                return "too_steep_angle";
+
+            default:
+                return "unknown";
+        }
     }
 }

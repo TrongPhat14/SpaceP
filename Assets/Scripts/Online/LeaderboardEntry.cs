@@ -7,7 +7,6 @@ public class LeaderboardEntry
     public int score;
     public int levelReached;
     public bool completedGame;
-    public float timeSeconds;
     public long createdAt;
 
     public LeaderboardEntry(
@@ -15,7 +14,6 @@ public class LeaderboardEntry
         int score,
         int levelReached,
         bool completedGame,
-        float timeSeconds,
         long createdAt
     )
     {
@@ -23,7 +21,6 @@ public class LeaderboardEntry
         this.score = score;
         this.levelReached = levelReached;
         this.completedGame = completedGame;
-        this.timeSeconds = timeSeconds;
         this.createdAt = createdAt;
     }
 }

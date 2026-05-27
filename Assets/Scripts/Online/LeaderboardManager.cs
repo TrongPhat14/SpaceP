@@ -11,7 +11,7 @@ public static class LeaderboardManager
     private const string SubmittedCompletedScoreKey = "LeaderboardSubmittedCompletedScore";
     private const string LeaderboardPath = "leaderboards/global";
     private const int MaxSavedEntries = 20;
-    private const int MaxPlayerNameLength = 12;
+    private const int MaxPlayerNameLength = 15;
 
     [Serializable]
     private class LeaderboardEntryList
@@ -87,7 +87,6 @@ public static class LeaderboardManager
             saveData.totalScore,
             saveData.levelNumber,
             saveData.isGameCompleted,
-            0f,
             DateTimeOffset.UtcNow.ToUnixTimeSeconds()
         );
 
