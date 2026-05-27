@@ -25,6 +25,8 @@ Assets/google-services.json
 Assets/StreamingAssets/google-services-desktop.json
 Assets/google-services.json.meta
 Assets/StreamingAssets/google-services-desktop.json.meta
+Assets/Plugins/Android/FirebaseApp.androidlib/res/values/google-services.xml
+Assets/Plugins/Android/FirebaseApp.androidlib/res/values/google-services.xml.meta
 
 # Firebase macOS native plugins are large and not needed for this Windows/Android project.
 Assets/Firebase/Plugins/x86_64/*.bundle
