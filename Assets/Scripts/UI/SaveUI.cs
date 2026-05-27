@@ -137,15 +137,23 @@ public class SaveUI : MonoBehaviour
 
     private void UpdateSelectedFrame()
     {
-        if (!saveUI.activeSelf)
+        if (saveUI == null || !saveUI.activeSelf || UnityEngine.EventSystems.EventSystem.current == null)
         {
             return;
         }
 
         GameObject selectedObject = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
 
-        continueSelectedFrame.SetActive(selectedObject == continueButton.gameObject);
-        newGameSelectedFrame.SetActive(selectedObject == newGameButton.gameObject);
-        backSelectedFrame.SetActive(selectedObject == backButton.gameObject);
+        SetSelectedFrame(continueSelectedFrame, continueButton != null && selectedObject == continueButton.gameObject);
+        SetSelectedFrame(newGameSelectedFrame, newGameButton != null && selectedObject == newGameButton.gameObject);
+        SetSelectedFrame(backSelectedFrame, backButton != null && selectedObject == backButton.gameObject);
+    }
+
+    private void SetSelectedFrame(GameObject selectedFrame, bool active)
+    {
+        if (selectedFrame != null)
+        {
+            selectedFrame.SetActive(active);
+        }
     }
 }

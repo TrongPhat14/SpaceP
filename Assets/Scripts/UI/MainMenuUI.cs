@@ -103,17 +103,27 @@ public class MainMenuUI : MonoBehaviour
 
     private void UpdateSelectedFrame()
     {
-        GameObject selectedObject = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
-
-        playSelectedFrame.SetActive(selectedObject == playButton.gameObject);
-
-        storeSelectedFrame.SetActive(selectedObject == storeButton.gameObject);
-
-        if (leaderboardButton != null && leaderBoardSelectedFrame != null)
+        if (mainMenuUI == null || !mainMenuUI.activeSelf || UnityEngine.EventSystems.EventSystem.current == null)
         {
-            leaderBoardSelectedFrame.SetActive(selectedObject == leaderboardButton.gameObject);
+            return;
         }
 
-        quitSelectedFrame.SetActive(selectedObject == quitButton.gameObject);
+        GameObject selectedObject = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
+
+        SetSelectedFrame(playSelectedFrame, playButton != null && selectedObject == playButton.gameObject);
+
+        SetSelectedFrame(storeSelectedFrame, storeButton != null && selectedObject == storeButton.gameObject);
+
+        SetSelectedFrame(leaderBoardSelectedFrame, leaderboardButton != null && selectedObject == leaderboardButton.gameObject);
+
+        SetSelectedFrame(quitSelectedFrame, quitButton != null && selectedObject == quitButton.gameObject);
+    }
+
+    private void SetSelectedFrame(GameObject selectedFrame, bool active)
+    {
+        if (selectedFrame != null)
+        {
+            selectedFrame.SetActive(active);
+        }
     }
 }

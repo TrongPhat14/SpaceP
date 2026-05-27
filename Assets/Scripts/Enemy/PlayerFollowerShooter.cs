@@ -4,7 +4,6 @@ public class PlayerFollowerShooter : MonoBehaviour
 {
     [SerializeField] private Transform aimTransform;
     [SerializeField] private Transform firePoint;
-    [SerializeField] private EnemyProjectile projectilePrefab;
     [SerializeField] private float followDistance = 6f;
     [SerializeField] private float stopDistance = 3f;
     [SerializeField] private float moveSpeed = 2f;
@@ -13,7 +12,9 @@ public class PlayerFollowerShooter : MonoBehaviour
     [SerializeField] private float aimRotationOffset = -90f;
 
     private Transform target;
+    private ProjectilePool projectilePool;
     private float fireTimer;
+    private bool loggedMissingPool;
 
     private void Start()
     {
@@ -21,12 +22,28 @@ public class PlayerFollowerShooter : MonoBehaviour
         {
             target = PlayerMovement.Instance.transform;
         }
+
+        if (projectilePool == null)
+        {
+            projectilePool = FindFirstObjectByType<ProjectilePool>();
+        }
     }
 
     private void Update()
     {
-        if (target == null || projectilePrefab == null || firePoint == null)
+        if (target == null || firePoint == null)
         {
+            return;
+        }
+
+        if (projectilePool == null)
+        {
+            if (!loggedMissingPool)
+            {
+                Debug.LogError("PlayerFollowerShooter needs a ProjectilePool in this level.");
+                loggedMissingPool = true;
+            }
+
             return;
         }
 
@@ -70,7 +87,11 @@ public class PlayerFollowerShooter : MonoBehaviour
 
     private void Fire(Vector2 direction)
     {
-        EnemyProjectile projectile = Instantiate(projectilePrefab, firePoint.position, Quaternion.identity);
-        projectile.Launch(direction, projectileSpeed);
+        EnemyProjectile projectile = projectilePool.Get(firePoint.position, Quaternion.identity);
+
+        if (projectile != null)
+        {
+            projectile.Launch(direction, projectileSpeed);
+        }
     }
 }
