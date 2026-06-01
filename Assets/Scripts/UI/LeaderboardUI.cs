@@ -52,6 +52,7 @@ public class LeaderboardUI : MonoBehaviour
 
     public void LoadLeaderboard()
     {
+        DOTweenUIAnimator.PunchScale(refreshButton != null ? refreshButton.transform : null);
         SetStatus("Loading leaderboard...");
         SetRowsVisible(false);
 
@@ -110,6 +111,7 @@ public class LeaderboardUI : MonoBehaviour
         if (statusText != null)
         {
             statusText.text = message;
+            DOTweenUIAnimator.PunchScale(statusText.transform, 0.06f);
         }
     }
 
@@ -124,12 +126,12 @@ public class LeaderboardUI : MonoBehaviour
 
         if (refreshButton != null && refreshSelectedFrame != null)
         {
-            refreshSelectedFrame.SetActive(selectedObject == refreshButton.gameObject);
+            DOTweenUIAnimator.SetSelectedFrame(refreshSelectedFrame, selectedObject == refreshButton.gameObject);
         }
 
         if (backButton != null && backSelectedFrame != null)
         {
-            backSelectedFrame.SetActive(selectedObject == backButton.gameObject);
+            DOTweenUIAnimator.SetSelectedFrame(backSelectedFrame, selectedObject == backButton.gameObject);
         }
     }
 }

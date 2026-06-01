@@ -1,3 +1,5 @@
+using System.Collections;
+using DG.Tweening;
 using UnityEngine;
 
 public class EnemyProjectile : MonoBehaviour
@@ -6,28 +8,23 @@ public class EnemyProjectile : MonoBehaviour
 
     private Rigidbody2D rb;
     private ProjectilePool projectilePool;
-    private float lifeTimer;
+    private Coroutine lifeCoroutine;
+    private Vector3 originalScale;
     private bool isReleased;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        originalScale = transform.localScale;
     }
 
     private void OnEnable()
     {
-        lifeTimer = lifeTime;
         isReleased = false;
-    }
-
-    private void Update()
-    {
-        lifeTimer -= Time.deltaTime;
-
-        if (lifeTimer <= 0f)
-        {
-            Release();
-        }
+        transform.DOKill();
+        transform.localScale = originalScale * 0.7f;
+        transform.DOScale(originalScale, 0.12f).SetLink(gameObject).SetEase(Ease.OutBack);
+        lifeCoroutine = StartCoroutine(LifeRoutine());
     }
 
     public void SetPool(ProjectilePool projectilePool)
@@ -62,6 +59,8 @@ public class EnemyProjectile : MonoBehaviour
 
         rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0f;
+        transform.DOKill();
+        transform.localScale = originalScale;
     }
 
     private void Release()
@@ -73,6 +72,12 @@ public class EnemyProjectile : MonoBehaviour
 
         isReleased = true;
 
+        if (lifeCoroutine != null)
+        {
+            StopCoroutine(lifeCoroutine);
+            lifeCoroutine = null;
+        }
+
         if (projectilePool != null)
         {
             projectilePool.Release(this);
@@ -80,5 +85,12 @@ public class EnemyProjectile : MonoBehaviour
         }
 
         Destroy(gameObject);
+    }
+
+    private IEnumerator LifeRoutine()
+    {
+        yield return new WaitForSeconds(lifeTime);
+
+        Release();
     }
 }

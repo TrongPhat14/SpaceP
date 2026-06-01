@@ -75,12 +75,12 @@ using UnityEngine.InputSystem.Utilities;
 public partial class @InputActions: IInputActionCollection2, IDisposable
 {
     /// <summary>
-    /// Provides access to the underlying asset Instance.
+    /// Provides access to the underlying asset instance.
     /// </summary>
     public InputActionAsset asset { get; }
 
     /// <summary>
-    /// Constructs a new Instance.
+    /// Constructs a new instance.
     /// </summary>
     public @InputActions()
     {
@@ -343,7 +343,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         private @InputActions m_Wrapper;
 
         /// <summary>
-        /// Construct a new Instance of the input action map wrapper class.
+        /// Construct a new instance of the input action map wrapper class.
         /// </summary>
         public PlayerActions(@InputActions wrapper) { m_Wrapper = wrapper; }
         /// <summary>
@@ -367,7 +367,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Menu => m_Wrapper.m_Player_Menu;
         /// <summary>
-        /// Provides access to the underlying input action map Instance.
+        /// Provides access to the underlying input action map instance.
         /// </summary>
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
@@ -377,13 +377,13 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
         public bool enabled => Get().enabled;
         /// <summary>
-        /// Implicitly converts an <see ref="PlayerActions" /> to an <see ref="InputActionMap" /> Instance.
+        /// Implicitly converts an <see ref="PlayerActions" /> to an <see ref="InputActionMap" /> instance.
         /// </summary>
         public static implicit operator InputActionMap(PlayerActions set) { return set.Get(); }
         /// <summary>
         /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
         /// </summary>
-        /// <param name="instance">Callback Instance.</param>
+        /// <param name="instance">Callback instance.</param>
         /// <remarks>
         /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
         /// </remarks>
@@ -463,7 +463,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         }
     }
     /// <summary>
-    /// Provides a new <see cref="PlayerActions" /> Instance referencing this action map.
+    /// Provides a new <see cref="PlayerActions" /> instance referencing this action map.
     /// </summary>
     public PlayerActions @Player => new PlayerActions(this);
     /// <summary>

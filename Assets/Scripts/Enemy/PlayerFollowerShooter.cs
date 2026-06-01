@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerFollowerShooter : MonoBehaviour
@@ -13,7 +14,7 @@ public class PlayerFollowerShooter : MonoBehaviour
 
     private Transform target;
     private ProjectilePool projectilePool;
-    private float fireTimer;
+    private Coroutine fireCoroutine;
     private bool loggedMissingPool;
 
     private void Start()
@@ -33,6 +34,7 @@ public class PlayerFollowerShooter : MonoBehaviour
     {
         if (target == null || firePoint == null)
         {
+            StopFiring();
             return;
         }
 
@@ -44,6 +46,7 @@ public class PlayerFollowerShooter : MonoBehaviour
                 loggedMissingPool = true;
             }
 
+            StopFiring();
             return;
         }
 
@@ -63,14 +66,20 @@ public class PlayerFollowerShooter : MonoBehaviour
 
         if (distance <= followDistance)
         {
-            fireTimer -= Time.deltaTime;
-
-            if (fireTimer <= 0f)
+            if (fireCoroutine == null)
             {
-                Fire(toTarget.normalized);
-                fireTimer = fireInterval;
+                fireCoroutine = StartCoroutine(FireRoutine());
             }
         }
+        else
+        {
+            StopFiring();
+        }
+    }
+
+    private void OnDisable()
+    {
+        StopFiring();
     }
 
     private void RotateTowardTarget(Vector2 direction)
@@ -93,5 +102,36 @@ public class PlayerFollowerShooter : MonoBehaviour
         {
             projectile.Launch(direction, projectileSpeed);
         }
+
+        Transform recoilTarget = aimTransform != null ? aimTransform : transform;
+        DOTweenUIAnimator.PunchScale(recoilTarget, 0.08f);
+    }
+
+    private IEnumerator FireRoutine()
+    {
+        while (target != null && firePoint != null && projectilePool != null)
+        {
+            Vector2 toTarget = target.position - firePoint.position;
+
+            if (toTarget.sqrMagnitude > 0.001f)
+            {
+                Fire(toTarget.normalized);
+            }
+
+            yield return new WaitForSeconds(fireInterval);
+        }
+
+        fireCoroutine = null;
+    }
+
+    private void StopFiring()
+    {
+        if (fireCoroutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(fireCoroutine);
+        fireCoroutine = null;
     }
 }

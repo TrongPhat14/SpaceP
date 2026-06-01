@@ -1,6 +1,3 @@
-using UnityEngine;
-using UnityEngine.SceneManagement;
-
 public static class SceneLoader
 {
     public enum Scene
@@ -14,6 +11,6 @@ public static class SceneLoader
 
     public static void LoadScene(Scene scene)
     {
-        SceneManager.LoadScene(scene.ToString());
+        SceneTransition.LoadScene(scene.ToString());
     }
 }

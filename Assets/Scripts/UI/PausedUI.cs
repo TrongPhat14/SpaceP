@@ -46,7 +46,7 @@ public class PausedUI : MonoBehaviour
 
         musicVolumeTextMesh.text = "MUSIC " + MusicManager.Instance.GetMusicVolume();
         soundVolumeTextMesh.text = "SOUND " + SoundManager.Instance.GetSoundVolume();
-        Hide();
+        DOTweenUIAnimator.HidePanelImmediate(gameObject);
     }
 
     private void Update()
@@ -66,14 +66,14 @@ public class PausedUI : MonoBehaviour
 
     private void Show()
     {
-        gameObject.SetActive(true);
+        DOTweenUIAnimator.ShowPanel(gameObject, true);
         resumeButon.Select();
         UpdateSelectedFrame();
 
     }
     private void Hide()
     {
-        gameObject.SetActive(false);
+        DOTweenUIAnimator.HidePanel(gameObject, true);
     }
 
     private void UpdateSelectedFrame()
@@ -95,7 +95,7 @@ public class PausedUI : MonoBehaviour
     {
         if (selectedFrame != null)
         {
-            selectedFrame.SetActive(active);
+            DOTweenUIAnimator.SetSelectedFrame(selectedFrame, active, true);
         }
     }
 }

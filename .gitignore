@@ -6,6 +6,7 @@
 [Ll]ogs/
 UserSettings/
 .utmp/
+docs/
 
 *.csproj
 *.sln

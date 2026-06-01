@@ -91,14 +91,14 @@ public class MainMenuUI : MonoBehaviour
 
     public void Show()
     {
-        mainMenuUI.SetActive(true);
+        DOTweenUIAnimator.ShowPanel(mainMenuUI);
 
         playButton.Select();
     }
 
     public void Hide()
     {
-        mainMenuUI.SetActive(false);
+        DOTweenUIAnimator.HidePanel(mainMenuUI);
     }
 
     private void UpdateSelectedFrame()
@@ -123,7 +123,7 @@ public class MainMenuUI : MonoBehaviour
     {
         if (selectedFrame != null)
         {
-            selectedFrame.SetActive(active);
+            DOTweenUIAnimator.SetSelectedFrame(selectedFrame, active);
         }
     }
 }

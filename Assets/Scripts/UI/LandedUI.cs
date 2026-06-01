@@ -1,4 +1,5 @@
 using System;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,12 +26,14 @@ public class LandedUI : MonoBehaviour
         PlayerMovement.Instance.onLanded += lander_onLanded;
 
         nextButton.Select();
-        Hide();
+        DOTweenUIAnimator.HidePanelImmediate(gameObject);
     }
 
     private void lander_onLanded(object sender, PlayerMovement.OnLandedEventArgs e)
     {
-        if (e.landingType == PlayerMovement.LandingType.Success)
+        bool successLanding = e.landingType == PlayerMovement.LandingType.Success;
+
+        if (successLanding)
         {
             titleTextMesh.text = "SUCCESSFUL LANDING!";
             nextButtonTextMexh.text = "NEXT LEVEL";
@@ -50,6 +53,13 @@ public class LandedUI : MonoBehaviour
             e.score;
 
         Show();
+
+        DOTweenUIAnimator.PunchScale(titleTextMesh.transform, successLanding ? 0.14f : 0.22f);
+
+        if (!successLanding && TryGetComponent(out RectTransform rectTransform))
+        {
+            rectTransform.DOShakeAnchorPos(0.28f, 12f, 14, 90f, false, true);
+        }
     }
     private string GetCrashTitle(PlayerMovement.LandingType landingType)
     {
@@ -71,12 +81,12 @@ public class LandedUI : MonoBehaviour
 
     private void Show()
     {
-        gameObject.SetActive(true);
+        DOTweenUIAnimator.ShowPanel(gameObject);
         nextButton.Select();
     }
 
     private void Hide()
     {
-        gameObject.SetActive(false);
+        DOTweenUIAnimator.HidePanel(gameObject);
     }
 }

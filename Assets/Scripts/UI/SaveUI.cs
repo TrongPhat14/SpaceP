@@ -46,7 +46,7 @@ public class SaveUI : MonoBehaviour
 
     private void Start()
     {
-        Hide();
+        DOTweenUIAnimator.HidePanelImmediate(saveUI);
     }
 
     private void Update()
@@ -56,7 +56,7 @@ public class SaveUI : MonoBehaviour
 
     public void Show()
     {
-        saveUI.SetActive(true);
+        DOTweenUIAnimator.ShowPanel(saveUI);
 
         UpdateSaveText();
 
@@ -65,7 +65,7 @@ public class SaveUI : MonoBehaviour
 
     public void Hide()
     {
-        saveUI.SetActive(false);
+        DOTweenUIAnimator.HidePanel(saveUI);
     }
 
     private void UpdateSaveText()
@@ -153,7 +153,7 @@ public class SaveUI : MonoBehaviour
     {
         if (selectedFrame != null)
         {
-            selectedFrame.SetActive(active);
+            DOTweenUIAnimator.SetSelectedFrame(selectedFrame, active);
         }
     }
 }

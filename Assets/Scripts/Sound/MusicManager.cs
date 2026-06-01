@@ -1,4 +1,5 @@
 using System;
+using DG.Tweening;
 using UnityEngine;
 
 public class MusicManager : MonoBehaviour
@@ -13,6 +14,7 @@ public class MusicManager : MonoBehaviour
     private event EventHandler OnMusicVolumeChange;
 
     private AudioSource musicAudioSource;
+    private Tween volumeTween;
 
     private void Awake()
     {
@@ -31,7 +33,11 @@ public class MusicManager : MonoBehaviour
     public void ChangeMusicVolume()
     {
         musicVolume = (musicVolume + 1) % MUSIC_VOLUME_MAX;
-        musicAudioSource.volume = GetMusicVolumeNormalized();
+        volumeTween?.Kill();
+        volumeTween = musicAudioSource
+            .DOFade(GetMusicVolumeNormalized(), 0.15f)
+            .SetLink(gameObject)
+            .SetUpdate(true);
         OnMusicVolumeChange?.Invoke(this, EventArgs.Empty);
     }
 
@@ -43,5 +49,10 @@ public class MusicManager : MonoBehaviour
     public float GetMusicVolumeNormalized()
     {
         return ((float)musicVolume) / MUSIC_VOLUME_MAX;
+    }
+
+    private void OnDisable()
+    {
+        volumeTween?.Kill();
     }
 }

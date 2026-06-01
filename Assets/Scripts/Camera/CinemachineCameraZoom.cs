@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -7,32 +8,50 @@ public class CinemachineCameraZoom : MonoBehaviour
 
     public static CinemachineCameraZoom Instance { get; private set; }
     [SerializeField] private CinemachineCamera cinemachineCamera;
+    [SerializeField] private float zoomDuration = 0.35f;
 
     private float targetOrthographicSize = 10f;
+    private Tween zoomTween;
 
 
     private void Awake()
     {
         Instance = this;
     }
-    private void LateUpdate()
-    {
-        float zoomSpead = 2f;
-        cinemachineCamera.Lens.OrthographicSize =
-            Mathf.Lerp(cinemachineCamera.Lens.OrthographicSize, targetOrthographicSize, Time.deltaTime * zoomSpead);
-    }
-/*    public void Update()
-    {
-        
-    }
-*/
     public void SetTargetOrthographicSize(float targetOrthographicSize)
     {
         this.targetOrthographicSize = targetOrthographicSize;
+
+        if (cinemachineCamera == null)
+        {
+            return;
+        }
+
+        zoomTween?.Kill();
+        zoomTween = DOTween
+            .To(
+                () => cinemachineCamera.Lens.OrthographicSize,
+                SetOrthographicSize,
+                targetOrthographicSize,
+                zoomDuration
+            )
+            .SetEase(Ease.OutSine);
     }
 
     public void SetNormalOrthographicSize()
     {
         SetTargetOrthographicSize(NORMAL_ORTHOGRAPHIC_SIZE);
+    }
+
+    private void SetOrthographicSize(float orthographicSize)
+    {
+        LensSettings lensSettings = cinemachineCamera.Lens;
+        lensSettings.OrthographicSize = orthographicSize;
+        cinemachineCamera.Lens = lensSettings;
+    }
+
+    private void OnDisable()
+    {
+        zoomTween?.Kill();
     }
 }

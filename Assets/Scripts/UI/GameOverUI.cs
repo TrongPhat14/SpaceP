@@ -59,6 +59,8 @@ public class GameOverUI : MonoBehaviour
 
     private void Start()
     {
+        DOTweenUIAnimator.ShowPanel(gameObject);
+
         saveData = SaveManager.LoadProgress();
 
         if (scoreTextMesh != null)
@@ -294,8 +296,8 @@ public class GameOverUI : MonoBehaviour
 
         GameObject selectedObject = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject;
 
-        SetActive(leaderboardSelectedFrame, leaderboardButton != null && selectedObject == leaderboardButton.gameObject);
-        SetActive(mainMenuSelectedFrame, mainMenuButton != null && selectedObject == mainMenuButton.gameObject);
+        SetSelectedFrame(leaderboardSelectedFrame, leaderboardButton != null && selectedObject == leaderboardButton.gameObject);
+        SetSelectedFrame(mainMenuSelectedFrame, mainMenuButton != null && selectedObject == mainMenuButton.gameObject);
     }
 
     private bool HasPlayerName(string playerName)
@@ -305,13 +307,21 @@ public class GameOverUI : MonoBehaviour
 
     private void SetSubmitStatus(SubmitStatus submitStatus)
     {
-        SetActive(readyStatusObject, submitStatus == SubmitStatus.Ready);
-        SetActive(submittingStatusObject, submitStatus == SubmitStatus.Submitting);
-        SetActive(submittedStatusObject, submitStatus == SubmitStatus.Submitted);
-        SetActive(submitErrorStatusObject, submitStatus == SubmitStatus.Error);
+        SetStatusObject(readyStatusObject, submitStatus == SubmitStatus.Ready);
+        SetStatusObject(submittingStatusObject, submitStatus == SubmitStatus.Submitting);
+        SetStatusObject(submittedStatusObject, submitStatus == SubmitStatus.Submitted);
+        SetStatusObject(submitErrorStatusObject, submitStatus == SubmitStatus.Error);
     }
 
-    private void SetActive(GameObject targetObject, bool active)
+    private void SetSelectedFrame(GameObject targetObject, bool active)
+    {
+        if (targetObject != null)
+        {
+            DOTweenUIAnimator.SetSelectedFrame(targetObject, active);
+        }
+    }
+
+    private void SetStatusObject(GameObject targetObject, bool active)
     {
         if (targetObject != null)
         {
