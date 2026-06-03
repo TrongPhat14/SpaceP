@@ -12,6 +12,34 @@ PrefabInstance:
       propertyPath: m_Name
       value: LandingArea _x5
       objectReference: {fileID: 0}
+    - target: {fileID: 662100001234567890, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
+      propertyPath: lineWidth
+      value: 0.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 662100001234567890, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
+      propertyPath: scanSpeed
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 662100001234567890, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
+      propertyPath: localOffset.y
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 662100001234567890, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
+      propertyPath: outlineSize.x
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 662100001234567890, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
+      propertyPath: outlineSize.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 662100001234567890, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
+      propertyPath: segmentLength
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 662100001234567890, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
+      propertyPath: sortingSource
+      value: 
+      objectReference: {fileID: 9004496649444404090}
     - target: {fileID: 2528793770665625592, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
       propertyPath: m_Size.x
       value: 1.3253338
@@ -133,3 +161,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
+--- !u!212 &9004496649444404090 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 3774457778825522383, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
+  m_PrefabInstance: {fileID: 5230918480610379701}
+  m_PrefabAsset: {fileID: 0}

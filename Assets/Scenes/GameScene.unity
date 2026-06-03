@@ -1321,6 +1321,7 @@ MonoBehaviour:
   - {fileID: -258350586789589115, guid: 13c7f541c984ad146b40c53f40af3809, type: 3}
   - {fileID: -258350586789589115, guid: 5e2f7dc066194134aa85cae8294c3bb5, type: 3}
   - {fileID: -258350586789589115, guid: 5bde51d264a27d445960c4992e4d82f2, type: 3}
+  - {fileID: -258350586789589115, guid: db1308539adfea14fa74860c26dff2bd, type: 3}
   cinemachineCamera: {fileID: 34383900}
 --- !u!4 &310399298
 Transform:

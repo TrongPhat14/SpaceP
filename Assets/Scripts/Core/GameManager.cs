@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public const int CoinPickupScoreReward = 500;
+    public const int CoinPickupCurrencyReward = 50;
+
     public static GameManager Instance { get; private set; }
 
     private static int levelNumber = 1;
@@ -234,10 +237,8 @@ public class GameManager : MonoBehaviour
 
     private void lander_onCoinPickUp(object sender, EventArgs e)
     {
-        AddScore(500);
-
-        int pickupCoinReward = 50;
-        currentLevelCoins += pickupCoinReward;
+        AddScore(CoinPickupScoreReward);
+        currentLevelCoins += CoinPickupCurrencyReward;
 
         Debug.Log($"Current Level Coins: {currentLevelCoins}");
     }
