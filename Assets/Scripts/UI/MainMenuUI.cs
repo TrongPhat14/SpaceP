@@ -83,7 +83,7 @@ public class MainMenuUI : MonoBehaviour
     {
         GameManager.ResetStaticData();
 
-        SaveManager.ResetProgress();
+        SaveManager.ResetAllProgressAndShop();
         LeaderboardManager.ClearSubmittedCompletedScore();
 
         SceneLoader.LoadScene(SceneLoader.Scene.GameScene);

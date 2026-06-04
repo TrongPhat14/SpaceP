@@ -96,6 +96,9 @@ public static class SaveManager
             DefaultUpgradeLevel,
             DefaultUpgradeLevel
         );
+
+        PlayerCurrency.Reload();
+        UpgradeManager.Reload();
     }
 
     public static void DeleteSave()

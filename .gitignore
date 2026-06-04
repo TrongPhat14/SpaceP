@@ -16,6 +16,8 @@ docs/
 *.apk
 *.aab
 *.unitypackage
+*.keystore
+*.jks
 
 .vs/
 .vscode/

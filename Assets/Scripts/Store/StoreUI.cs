@@ -129,7 +129,7 @@ public class StoreUI : MonoBehaviour
         if (saveData != null && saveData.isGameCompleted)
         {
             GameManager.ResetStaticData();
-            SaveManager.ResetProgress();
+            SaveManager.ResetAllProgressAndShop();
             LeaderboardManager.ClearSubmittedCompletedScore();
         }
 
