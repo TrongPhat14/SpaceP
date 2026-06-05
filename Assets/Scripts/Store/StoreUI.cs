@@ -58,15 +58,25 @@ public class StoreUI : MonoBehaviour
     [SerializeField] private Button backButton;
     [SerializeField] private Button startButton;
 
+    [Header("Rewarded Ads")]
+    [SerializeField] private Button rewardedAdButton;
+    [SerializeField] private TextMeshProUGUI rewardedAdButtonText;
+    [SerializeField] private TextMeshProUGUI rewardedAdRewardText;
+    [SerializeField] private TextMeshProUGUI rewardedAdStatusText;
+    [SerializeField, Min(1)] private int rewardedAdCoins = 50;
+
     private bool hasRenderedUI;
     private int displayedCoins;
     private Tween coinsCountTween;
     private Tween coinsChangeTween;
     private bool hasCoinsChangeOriginalPosition;
     private Vector2 coinsChangeOriginalPosition;
+    private AdsManager adsManager;
 
     private void Awake()
     {
+        ResolveRewardedAdUI();
+
         foreach (StoreItemUI itemUI in storeItemUIArray)
         {
             StoreItemUI localItemUI = itemUI;
@@ -92,13 +102,212 @@ public class StoreUI : MonoBehaviour
         {
             startButton.onClick.AddListener(OnClickStart);
         }
+
+        if (rewardedAdButton != null)
+        {
+            rewardedAdButton.onClick.AddListener(OnClickRewardedAd);
+        }
     }
 
     private void Start()
     {
         displayedCoins = PlayerCurrency.GetCoins();
         EnsureCoinsChangeText();
+        RefreshNavigationButtons();
         RefreshUI();
+
+        adsManager = AdsManager.Instance;
+        adsManager.RewardedStateChanged += OnRewardedAdStateChanged;
+        adsManager.Initialize();
+        OnRewardedAdStateChanged(
+            adsManager.CurrentState,
+            GetRewardedAdStatus(adsManager.CurrentState)
+        );
+    }
+
+    private void ResolveRewardedAdUI()
+    {
+        GameObject panelObject = GameObject.Find("RewardedAdPanel");
+        if (panelObject == null)
+        {
+            return;
+        }
+
+        Transform panel = panelObject.transform;
+        Transform buttonTransform = panel.Find("WatchAdButton");
+
+        if (rewardedAdButton == null && buttonTransform != null)
+        {
+            rewardedAdButton = buttonTransform.GetComponent<Button>();
+        }
+
+        if (rewardedAdButtonText == null && buttonTransform != null)
+        {
+            Transform target = buttonTransform.Find("ButtonText");
+            rewardedAdButtonText =
+                target != null ? target.GetComponent<TextMeshProUGUI>() : null;
+        }
+
+        if (rewardedAdRewardText == null && buttonTransform != null)
+        {
+            Transform target = buttonTransform.Find("RewardText");
+            rewardedAdRewardText =
+                target != null ? target.GetComponent<TextMeshProUGUI>() : null;
+        }
+
+        if (rewardedAdStatusText == null)
+        {
+            Transform target = panel.Find("AdStatusText");
+            rewardedAdStatusText =
+                target != null ? target.GetComponent<TextMeshProUGUI>() : null;
+        }
+    }
+
+    private void OnClickRewardedAd()
+    {
+        if (!RewardedAdDailyLimit.HasRemainingViews())
+        {
+            RefreshRewardedAdUI();
+            return;
+        }
+
+        if (adsManager == null || !adsManager.IsRewardedAdReady)
+        {
+            AdsManager.RewardedAdState state =
+                adsManager != null
+                    ? adsManager.CurrentState
+                    : AdsManager.RewardedAdState.Unavailable;
+
+            OnRewardedAdStateChanged(
+                state,
+                GetRewardedAdStatus(state)
+            );
+            return;
+        }
+
+        rewardedAdButton.interactable = false;
+        adsManager.ShowRewardedAd(GrantRewardedAdCoins);
+    }
+
+    private void GrantRewardedAdCoins()
+    {
+        if (!RewardedAdDailyLimit.TryRecordCompletedView())
+        {
+            RefreshRewardedAdUI();
+            return;
+        }
+
+        int coinsBeforeReward = PlayerCurrency.GetCoins();
+        PlayerCurrency.AddCoins(rewardedAdCoins);
+        int coinsAfterReward = PlayerCurrency.GetCoins();
+
+        RefreshUI(false);
+        PlayCoinsRewardFeedback(coinsBeforeReward, coinsAfterReward);
+
+        if (rewardedAdStatusText != null)
+        {
+            rewardedAdStatusText.text =
+                "+"
+                + (coinsAfterReward - coinsBeforeReward)
+                + " COINS | "
+                + GetRemainingAdsText();
+        }
+    }
+
+    private void OnRewardedAdStateChanged(
+        AdsManager.RewardedAdState state,
+        string status
+    )
+    {
+        int remainingViews = RewardedAdDailyLimit.GetRemainingViews();
+        bool hasRemainingViews = remainingViews > 0;
+
+        if (rewardedAdButton != null)
+        {
+            rewardedAdButton.interactable =
+                state == AdsManager.RewardedAdState.Ready
+                && hasRemainingViews;
+        }
+
+        if (rewardedAdButtonText != null)
+        {
+            rewardedAdButtonText.text =
+                state == AdsManager.RewardedAdState.Showing
+                    ? "PLEASE WAIT"
+                    : "WATCH AD";
+        }
+
+        if (rewardedAdRewardText != null)
+        {
+            rewardedAdRewardText.text = "+" + rewardedAdCoins;
+        }
+
+        if (rewardedAdStatusText != null)
+        {
+            rewardedAdStatusText.text = hasRemainingViews
+                ? GetRewardedAdStatusWithRemainingViews(state, status)
+                : "DAILY LIMIT REACHED";
+        }
+    }
+
+    private void RefreshRewardedAdUI()
+    {
+        AdsManager.RewardedAdState state =
+            adsManager != null
+                ? adsManager.CurrentState
+                : AdsManager.RewardedAdState.Unavailable;
+
+        OnRewardedAdStateChanged(state, GetRewardedAdStatus(state));
+    }
+
+    private string GetRewardedAdStatusWithRemainingViews(
+        AdsManager.RewardedAdState state,
+        string status
+    )
+    {
+        if (state == AdsManager.RewardedAdState.Ready)
+        {
+            return GetRemainingAdsText();
+        }
+
+        return status;
+    }
+
+    private string GetRemainingAdsText()
+    {
+        return RewardedAdDailyLimit.GetRemainingViews()
+            + "/"
+            + RewardedAdDailyLimit.MaxViewsPerDay
+            + " ADS LEFT";
+    }
+
+    private string GetRewardedAdStatus(AdsManager.RewardedAdState state)
+    {
+        switch (state)
+        {
+            case AdsManager.RewardedAdState.Initializing:
+                return "INITIALIZING...";
+            case AdsManager.RewardedAdState.Loading:
+                return "LOADING...";
+            case AdsManager.RewardedAdState.Ready:
+#if UNITY_EDITOR && !ADMOB_ENABLED
+                return "EDITOR TEST READY";
+#else
+                return "FREE COINS";
+#endif
+            case AdsManager.RewardedAdState.Showing:
+                return "PLAYING AD...";
+            default:
+                return "AD UNAVAILABLE";
+        }
+    }
+
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        if (hasFocus && adsManager != null)
+        {
+            RefreshRewardedAdUI();
+        }
     }
 
     private void OnClickUpgrade(StoreItemUI itemUI)
@@ -128,12 +337,24 @@ public class StoreUI : MonoBehaviour
 
         if (saveData != null && saveData.isGameCompleted)
         {
-            GameManager.ResetStaticData();
-            SaveManager.ResetAllProgressAndShop();
-            LeaderboardManager.ClearSubmittedCompletedScore();
+            RefreshNavigationButtons();
+            return;
         }
 
         SceneLoader.LoadScene(SceneLoader.Scene.GameScene);
+    }
+
+    private void RefreshNavigationButtons()
+    {
+        if (startButton == null)
+        {
+            return;
+        }
+
+        SaveData saveData = SaveManager.LoadProgress();
+        bool canStartGame = saveData == null || !saveData.isGameCompleted;
+
+        startButton.gameObject.SetActive(canStartGame);
     }
 
     private void RefreshUI(bool updateCoinsText = true)
@@ -441,6 +662,92 @@ public class StoreUI : MonoBehaviour
         ShowCoinsChangeText(spentCoins);
     }
 
+    private void PlayCoinsRewardFeedback(int coinsBeforeReward, int coinsAfterReward)
+    {
+        if (coinsText == null)
+        {
+            return;
+        }
+
+        int receivedCoins = Mathf.Max(0, coinsAfterReward - coinsBeforeReward);
+
+        coinsCountTween?.Kill();
+        displayedCoins = coinsBeforeReward;
+        coinsText.text = displayedCoins.ToString();
+
+        coinsCountTween = DOTween
+            .To(
+                () => displayedCoins,
+                value =>
+                {
+                    displayedCoins = value;
+                    coinsText.text = displayedCoins.ToString();
+                },
+                coinsAfterReward,
+                0.55f
+            )
+            .SetLink(coinsText.gameObject)
+            .SetEase(Ease.OutCubic);
+
+        ShowCoinsRewardText(receivedCoins);
+        DOTweenUIAnimator.PunchScale(coinsText.transform, 0.12f);
+    }
+
+    private void ShowCoinsRewardText(int receivedCoins)
+    {
+        EnsureCoinsChangeText();
+
+        if (coinsChangeText == null || receivedCoins <= 0)
+        {
+            return;
+        }
+
+        CanvasGroup canvasGroup =
+            DOTweenUIAnimator.EnsureCanvasGroup(coinsChangeText.gameObject);
+        RectTransform rectTransform = coinsChangeText.transform as RectTransform;
+
+        coinsChangeTween?.Kill();
+        coinsChangeText.gameObject.SetActive(true);
+        coinsChangeText.text = "+" + receivedCoins;
+        coinsChangeText.color = new Color(0.25f, 1f, 0.35f, 1f);
+        canvasGroup.alpha = 1f;
+
+        if (rectTransform != null)
+        {
+            rectTransform.anchoredPosition = coinsChangeOriginalPosition;
+        }
+
+        Sequence sequence = DOTween.Sequence().SetLink(coinsChangeText.gameObject);
+        sequence.Join(canvasGroup.DOFade(0f, 0.7f).SetDelay(0.35f));
+
+        if (rectTransform != null)
+        {
+            sequence.Join(
+                rectTransform
+                    .DOAnchorPos(
+                        coinsChangeOriginalPosition + new Vector2(0f, 16f),
+                        0.7f
+                    )
+                    .SetEase(Ease.OutQuad)
+            );
+        }
+
+        sequence.OnComplete(() =>
+        {
+            if (coinsChangeText != null)
+            {
+                coinsChangeText.gameObject.SetActive(false);
+            }
+
+            if (rectTransform != null)
+            {
+                rectTransform.anchoredPosition = coinsChangeOriginalPosition;
+            }
+        });
+
+        coinsChangeTween = sequence;
+    }
+
     private void ShowCoinsChangeText(int spentCoins)
     {
         EnsureCoinsChangeText();
@@ -530,6 +837,11 @@ public class StoreUI : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (adsManager != null)
+        {
+            adsManager.RewardedStateChanged -= OnRewardedAdStateChanged;
+        }
+
         coinsCountTween?.Kill();
         coinsChangeTween?.Kill();
     }
