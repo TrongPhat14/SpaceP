@@ -1002,6 +1002,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2535619201665770838}
   - component: {fileID: 3071580180544039984}
+  - component: {fileID: 4829156301782549814}
   m_Layer: 0
   m_Name: ProjectilePool
   m_TagString: Untagged
@@ -1038,6 +1039,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectilePool
   projectilePrefab: {fileID: 1141664257253469506, guid: 943615e3e066b3641a737f3fcaa31d25, type: 3}
   initialSize: 10
+  lifecycleMode: 0
+--- !u!114 &4829156301782549814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1557935218658981725}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 255a89f0b5444c71b7036c832b382a71, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectilePoolingBenchmark
+  runOnStart: 0
+  scenario: 0
+  repetitions: 3
+  warmupSeconds: 15
+  measurementSeconds: 60
+  cooldownSeconds: 5
+  spawnPoint: {fileID: 0}
+  gameplaySpawnInterval: 1.5
+  stressSpawnInterval: 0.05
+  projectileSpeed: 8
 --- !u!1 &2267193136092600167
 GameObject:
   m_ObjectHideFlags: 0

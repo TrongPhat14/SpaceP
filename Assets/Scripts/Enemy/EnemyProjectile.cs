@@ -7,6 +7,11 @@ public class EnemyProjectile : MonoBehaviour
     [SerializeField] private float lifeTime = 4f;
 
     private Rigidbody2D rb;
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    private Collider2D projectileCollider;
+#endif
+
     private ProjectilePool projectilePool;
     private Coroutine lifeCoroutine;
     private Vector3 originalScale;
@@ -15,6 +20,11 @@ public class EnemyProjectile : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        projectileCollider = GetComponent<Collider2D>();
+#endif
+
         originalScale = transform.localScale;
     }
 
@@ -45,6 +55,16 @@ public class EnemyProjectile : MonoBehaviour
         transform.rotation = Quaternion.Euler(0f, 0f, angle);
     }
 
+    public void SetCollisionEnabled(bool isEnabled)
+    {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        if (projectileCollider != null)
+        {
+            projectileCollider.enabled = isEnabled;
+        }
+#endif
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         Release();
@@ -61,6 +81,10 @@ public class EnemyProjectile : MonoBehaviour
         rb.angularVelocity = 0f;
         transform.DOKill();
         transform.localScale = originalScale;
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        SetCollisionEnabled(true);
+#endif
     }
 
     private void Release()
