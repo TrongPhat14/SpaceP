@@ -24,6 +24,7 @@ public class ProjectilePoolingBenchmark : MonoBehaviour
     [SerializeField, Min(1f)] private float warmupSeconds = 15f;
     [SerializeField, Min(1f)] private float measurementSeconds = 60f;
     [SerializeField, Min(0f)] private float cooldownSeconds = 5f;
+    [SerializeField, Min(1f)] private float poolDrainTimeoutSeconds = 10f;
 
     [Header("Synthetic Projectile Load")]
     [SerializeField] private Transform spawnPoint;
@@ -45,8 +46,13 @@ public class ProjectilePoolingBenchmark : MonoBehaviour
     private long peakGcAllocatedBytes;
     private long memoryAtStartBytes;
     private long peakMemoryBytes;
+    private long memoryAtEndBytes;
     private float spawnAccumulator;
     private bool isMeasuring;
+    private float previousTimeScale;
+    private bool environmentPrepared;
+    private PlayerFollowerShooter[] playerFollowerShooters;
+    private bool[] shooterEnabledStates;
 
     private bool CanRunBenchmark =>
         Debug.isDebugBuild || Application.isEditor;
@@ -86,9 +92,12 @@ public class ProjectilePoolingBenchmark : MonoBehaviour
 
     private IEnumerator RunBenchmark()
     {
+        PrepareBenchmarkEnvironment();
         completedRunSummaries.Clear();
         currentStatus =
             $"Preparing {projectilePool.LifecycleMode} / {scenario}";
+
+        yield return WaitForProjectilesToDrain();
 
         for (int run = 1; run <= repetitions; run++)
         {
@@ -126,11 +135,88 @@ public class ProjectilePoolingBenchmark : MonoBehaviour
                     $"Run {run}/{repetitions}: cooldown ({cooldownSeconds:F0}s)";
                 yield return new WaitForSecondsRealtime(cooldownSeconds);
             }
+
+            yield return WaitForProjectilesToDrain();
         }
 
         currentStatus =
             $"Completed. CSV: {Path.Combine(Application.persistentDataPath, CsvFileName)}";
         benchmarkCoroutine = null;
+        RestoreBenchmarkEnvironment();
+    }
+
+    private void PrepareBenchmarkEnvironment()
+    {
+        if (environmentPrepared)
+        {
+            return;
+        }
+
+        previousTimeScale = Time.timeScale;
+        Time.timeScale = 1f;
+
+        playerFollowerShooters = FindObjectsByType<PlayerFollowerShooter>(
+            FindObjectsInactive.Include,
+            FindObjectsSortMode.None
+        );
+        shooterEnabledStates = new bool[playerFollowerShooters.Length];
+
+        for (int i = 0; i < playerFollowerShooters.Length; i++)
+        {
+            PlayerFollowerShooter shooter = playerFollowerShooters[i];
+            shooterEnabledStates[i] = shooter != null && shooter.enabled;
+
+            if (shooter != null)
+            {
+                shooter.enabled = false;
+            }
+        }
+
+        environmentPrepared = true;
+    }
+
+    private void RestoreBenchmarkEnvironment()
+    {
+        if (!environmentPrepared)
+        {
+            return;
+        }
+
+        Time.timeScale = previousTimeScale;
+
+        for (int i = 0; i < playerFollowerShooters.Length; i++)
+        {
+            PlayerFollowerShooter shooter = playerFollowerShooters[i];
+
+            if (shooter != null)
+            {
+                shooter.enabled = shooterEnabledStates[i];
+            }
+        }
+
+        playerFollowerShooters = null;
+        shooterEnabledStates = null;
+        environmentPrepared = false;
+    }
+
+    private IEnumerator WaitForProjectilesToDrain()
+    {
+        float elapsed = 0f;
+
+        while (projectilePool.GetStatistics().Active > 0 &&
+               elapsed < poolDrainTimeoutSeconds)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        int remainingProjectiles = projectilePool.GetStatistics().Active;
+        if (remainingProjectiles > 0)
+        {
+            Debug.LogWarning(
+                $"Projectile benchmark drain timed out with {remainingProjectiles} active projectile(s)."
+            );
+        }
     }
 
     private IEnumerator RunLoadForDuration(float duration, bool collectMetrics)
@@ -199,6 +285,7 @@ public class ProjectilePoolingBenchmark : MonoBehaviour
         peakGcAllocatedBytes = 0;
         memoryAtStartBytes = 0;
         peakMemoryBytes = 0;
+        memoryAtEndBytes = 0;
     }
 
     private void StartRecorders()
@@ -218,12 +305,7 @@ public class ProjectilePoolingBenchmark : MonoBehaviour
         {
             long memoryBytes = systemMemoryRecorder.LastValue;
 
-            if (memoryAtStartBytes <= 0L)
-            {
-                memoryAtStartBytes = memoryBytes;
-            }
-
-            peakMemoryBytes = Math.Max(peakMemoryBytes, memoryBytes);
+            RecordMemorySample(memoryBytes);
         }
     }
 
@@ -240,11 +322,24 @@ public class ProjectilePoolingBenchmark : MonoBehaviour
 
         if (systemMemoryRecorder.Valid)
         {
-            peakMemoryBytes = Math.Max(
-                peakMemoryBytes,
-                systemMemoryRecorder.LastValue
-            );
+            RecordMemorySample(systemMemoryRecorder.LastValue);
         }
+    }
+
+    private void RecordMemorySample(long memoryBytes)
+    {
+        if (memoryBytes <= 0L)
+        {
+            return;
+        }
+
+        if (memoryAtStartBytes <= 0L)
+        {
+            memoryAtStartBytes = memoryBytes;
+        }
+
+        memoryAtEndBytes = memoryBytes;
+        peakMemoryBytes = Math.Max(peakMemoryBytes, memoryBytes);
     }
 
     private void StopRecorders()
@@ -274,10 +369,6 @@ public class ProjectilePoolingBenchmark : MonoBehaviour
             ? frameTimesMs[frameTimesMs.Count - 1]
             : 0f;
         float onePercentLowFps = CalculateOnePercentLowFps(frameTimesMs);
-        long memoryAtEnd = systemMemoryRecorder.Valid
-            ? systemMemoryRecorder.LastValue
-            : -1L;
-
         return new BenchmarkResult
         {
             TimestampUtc = DateTime.UtcNow.ToString("O"),
@@ -307,7 +398,9 @@ public class ProjectilePoolingBenchmark : MonoBehaviour
             PeakMemoryBytes = systemMemoryRecorder.Valid
                 ? peakMemoryBytes
                 : -1L,
-            MemoryAtEndBytes = memoryAtEnd,
+            MemoryAtEndBytes = memoryAtEndBytes > 0L
+                ? memoryAtEndBytes
+                : -1L,
             ProjectilesCreated =
                 endStats.TotalCreated - startStats.TotalCreated,
             ProjectilesReused =
@@ -450,9 +543,23 @@ public class ProjectilePoolingBenchmark : MonoBehaviour
         GUILayout.EndArea();
     }
 
+    private void OnDisable()
+    {
+        if (benchmarkCoroutine != null)
+        {
+            StopCoroutine(benchmarkCoroutine);
+            benchmarkCoroutine = null;
+        }
+
+        isMeasuring = false;
+        DisposeRecorders();
+        RestoreBenchmarkEnvironment();
+    }
+
     private void OnDestroy()
     {
         DisposeRecorders();
+        RestoreBenchmarkEnvironment();
     }
 
     private void DisposeRecorders()

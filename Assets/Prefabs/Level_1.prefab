@@ -1058,6 +1058,7 @@ MonoBehaviour:
   warmupSeconds: 15
   measurementSeconds: 60
   cooldownSeconds: 5
+  poolDrainTimeoutSeconds: 10
   spawnPoint: {fileID: 0}
   gameplaySpawnInterval: 1.5
   stressSpawnInterval: 0.05
