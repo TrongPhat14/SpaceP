@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-#if ADMOB_ENABLED
+#if ADMOB_ENABLED && !UNITY_EDITOR
 using GoogleMobileAds.Api;
 using GoogleMobileAds.Ump.Api;
 #endif
@@ -57,7 +57,7 @@ public class AdsManager : MonoBehaviour
     private bool rewardGrantedForCurrentAd;
     private Coroutine retryCoroutine;
 
-#if ADMOB_ENABLED
+#if ADMOB_ENABLED && !UNITY_EDITOR
     private bool mobileAdsInitializationStarted;
     private RewardedAd rewardedAd;
 #endif
@@ -85,13 +85,13 @@ public class AdsManager : MonoBehaviour
         isInitializationInProgress = true;
         SetState(RewardedAdState.Initializing, "INITIALIZING...");
 
-#if ADMOB_ENABLED
-        MobileAds.RaiseAdEventsOnUnityMainThread = true;
-        RequestConsentAndInitializeAds();
-#elif UNITY_EDITOR
+#if UNITY_EDITOR
         isInitialized = true;
         isInitializationInProgress = false;
         SetState(RewardedAdState.Ready, "EDITOR TEST READY");
+#elif ADMOB_ENABLED
+        MobileAds.RaiseAdEventsOnUnityMainThread = true;
+        RequestConsentAndInitializeAds();
 #else
         isInitializationInProgress = false;
         SetState(
@@ -111,7 +111,9 @@ public class AdsManager : MonoBehaviour
 
         SetState(RewardedAdState.Showing, "PLAYING AD...");
 
-#if ADMOB_ENABLED
+#if UNITY_EDITOR
+        StartCoroutine(SimulateRewardedAd(onRewardEarned));
+#elif ADMOB_ENABLED
         if (rewardedAd == null || !rewardedAd.CanShowAd())
         {
             LoadRewardedAd();
@@ -129,8 +131,6 @@ public class AdsManager : MonoBehaviour
             rewardGrantedForCurrentAd = true;
             onRewardEarned?.Invoke();
         });
-#elif UNITY_EDITOR
-        StartCoroutine(SimulateRewardedAd(onRewardEarned));
 #else
         SetState(RewardedAdState.Unavailable, "AD UNAVAILABLE");
 #endif
@@ -156,7 +156,7 @@ public class AdsManager : MonoBehaviour
             case RewardedAdState.Loading:
                 return "LOADING...";
             case RewardedAdState.Ready:
-#if UNITY_EDITOR && !ADMOB_ENABLED
+#if UNITY_EDITOR
                 return "EDITOR TEST READY";
 #else
                 return "FREE COINS";
@@ -168,7 +168,7 @@ public class AdsManager : MonoBehaviour
         }
     }
 
-#if ADMOB_ENABLED
+#if ADMOB_ENABLED && !UNITY_EDITOR
     private void RequestConsentAndInitializeAds()
     {
         ConsentRequestParameters requestParameters =
@@ -295,7 +295,7 @@ public class AdsManager : MonoBehaviour
     }
 #endif
 
-#if UNITY_EDITOR && !ADMOB_ENABLED
+#if UNITY_EDITOR
     private IEnumerator SimulateRewardedAd(Action onRewardEarned)
     {
         yield return new WaitForSecondsRealtime(0.8f);
@@ -321,7 +321,7 @@ public class AdsManager : MonoBehaviour
     {
         StopRetry();
 
-#if ADMOB_ENABLED
+#if ADMOB_ENABLED && !UNITY_EDITOR
         DisposeRewardedAd();
 #endif
 

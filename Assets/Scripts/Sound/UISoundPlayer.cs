@@ -27,6 +27,27 @@ public static class UISoundPlayer
         audioSource.PlayOneShot(navigationClip, volume);
     }
 
+    public static void PlayOneShot(AudioClip clip)
+    {
+        if (clip == null)
+        {
+            return;
+        }
+
+        EnsureAudioSource();
+
+        if (audioSource == null)
+        {
+            return;
+        }
+
+        float volume = SoundManager.Instance != null
+            ? SoundManager.Instance.GetSoundVolumeNormalized()
+            : DefaultVolume;
+
+        audioSource.PlayOneShot(clip, volume);
+    }
+
     private static void EnsureAudioSource()
     {
         if (audioSource != null)

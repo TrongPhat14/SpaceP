@@ -54,6 +54,9 @@ public class StoreUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI coinsText;
     [SerializeField] private TextMeshProUGUI coinsChangeText;
 
+    [Header("Audio")]
+    [SerializeField] private AudioClip purchaseSuccessClip;
+
     [Header("Navigation Buttons")]
     [SerializeField] private Button backButton;
     [SerializeField] private Button startButton;
@@ -322,11 +325,12 @@ public class StoreUI : MonoBehaviour
         bool upgraded = UpgradeManager.TryUpgrade(itemUI.itemData);
         int coinsAfterUpgrade = PlayerCurrency.GetCoins();
 
-        RefreshUI(!upgraded);
         PlayUpgradeFeedback(itemUI, upgraded);
 
         if (upgraded)
         {
+            RefreshItemUI(itemUI);
+            UISoundPlayer.PlayOneShot(purchaseSuccessClip);
             PlayCoinsSpendFeedback(coinsBeforeUpgrade, coinsAfterUpgrade);
         }
     }
@@ -621,13 +625,13 @@ public class StoreUI : MonoBehaviour
         }
     }
 
-    private void PlayUpgradeFeedback(StoreItemUI itemUI, bool coinsChanged)
+    private void PlayUpgradeFeedback(StoreItemUI itemUI, bool upgraded)
     {
         DOTweenUIAnimator.PunchScale(itemUI.upgradeButton != null ? itemUI.upgradeButton.transform : null, 0.12f);
-        DOTweenUIAnimator.PunchScale(itemUI.levelText != null ? itemUI.levelText.transform : null, 0.1f);
 
-        if (coinsChanged)
+        if (upgraded)
         {
+            DOTweenUIAnimator.PunchScale(itemUI.levelText != null ? itemUI.levelText.transform : null, 0.1f);
             DOTweenUIAnimator.PunchScale(coinsText != null ? coinsText.transform : null, 0.1f);
         }
     }
