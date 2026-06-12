@@ -8,4 +8,6 @@ public static class SaveKeys
     public const string EnginePowerLevel = "SAVE_ENGINE_POWER_LEVEL";
     public const string RotationControlLevel = "SAVE_ROTATION_CONTROL_LEVEL";
     public const string LandingStabilizerLevel = "SAVE_LANDING_STABILIZER_LEVEL";
+    public const string ControlsTutorialCompleted = "Tutorial.ControlsCompleted";
+    public const string MechanicTutorialPrefix = "Tutorial.Mechanic.";
 }

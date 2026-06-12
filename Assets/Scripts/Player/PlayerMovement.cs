@@ -53,6 +53,9 @@ public class PlayerMovement : MonoBehaviour
     private State state;
 
     private bool hasLandingResult;
+    private bool tutorialControlLocked;
+    private RigidbodyConstraints2D constraintsBeforeTutorial;
+    private float gravityScaleBeforeTutorial;
 
     private void Awake()
     {
@@ -74,6 +77,11 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (tutorialControlLocked)
+        {
+            return;
+        }
+
         onBeforeForce?.Invoke(this, EventArgs.Empty);
 
         Vector2 movementInput = GameInput.Instance.GetMovementInputVector2();
@@ -317,5 +325,31 @@ public class PlayerMovement : MonoBehaviour
     public float GetFuel()
     {
         return fuelAmount;
+    }
+
+    public void SetTutorialControlLocked(bool isLocked)
+    {
+        if (rb == null || tutorialControlLocked == isLocked)
+        {
+            return;
+        }
+
+        tutorialControlLocked = isLocked;
+
+        if (isLocked)
+        {
+            constraintsBeforeTutorial = rb.constraints;
+            gravityScaleBeforeTutorial = rb.gravityScale;
+            rb.linearVelocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+            rb.gravityScale = 0f;
+            rb.constraints = RigidbodyConstraints2D.FreezeAll;
+            return;
+        }
+
+        rb.constraints = constraintsBeforeTutorial;
+        rb.gravityScale = gravityScaleBeforeTutorial;
+        rb.linearVelocity = Vector2.zero;
+        rb.angularVelocity = 0f;
     }
 }

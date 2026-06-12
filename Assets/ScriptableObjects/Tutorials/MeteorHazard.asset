@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70f3de7a09f34ef59a61fc4d047c7e8d, type: 3}
+  m_Name: MeteorHazard
+  m_EditorClassIdentifier: Assembly-CSharp::MechanicTutorialData
+  tutorialId: meteor-hazard
+  category: NEW HAZARD
+  title: METEOR HAZARD
+  items:
+  - itemName: METEOR
+    icon: {fileID: 3161377183836907632, guid: 42e16cc16486d4042b5bf28b332a4526, type: 3}
+    description: Meteors cause an instant crash. Watch their movement and keep your distance.

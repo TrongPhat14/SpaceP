@@ -138,6 +138,10 @@ public class GameManager : MonoBehaviour
         );
 
         AnalyticsManager.LogLevelStart(levelNumber, totalScore);
+
+        MechanicTutorialUI.Instance?.TryShow(
+            spawnedGameLevel.GetMechanicTutorial()
+        );
     }
 
     private GameLevel GetGameLevel()
@@ -164,6 +168,13 @@ public class GameManager : MonoBehaviour
         }
 
         return false;
+    }
+
+    public int GetCurrentLevelCompleteCoinReward()
+    {
+        return spawnedGameLevel != null
+            ? spawnedGameLevel.GetCompleteCoinReward()
+            : 0;
     }
 
     private void Lander_onLanded(object sender, PlayerMovement.OnLandedEventArgs e)

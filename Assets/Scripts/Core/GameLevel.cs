@@ -7,6 +7,7 @@ public class GameLevel : MonoBehaviour
     [SerializeField] private Transform cameraStartPosition;
     [SerializeField] private float zoomOutOrthographicSize;
     [SerializeField] private int completeCoinReward = 100;
+    [SerializeField] private MechanicTutorialData mechanicTutorial;
 
     public int GetLevelNumber()
     {
@@ -31,5 +32,10 @@ public class GameLevel : MonoBehaviour
     public int GetCompleteCoinReward()
     {
         return completeCoinReward;
+    }
+
+    public MechanicTutorialData GetMechanicTutorial()
+    {
+        return mechanicTutorial;
     }
 }
