@@ -1,4 +1,5 @@
 using System;
+using SpaceP.Scoring;
 using UnityEngine;
 
 public class ShipVisual : MonoBehaviour
@@ -30,11 +31,11 @@ public class ShipVisual : MonoBehaviour
 
     private void Lander_onLanded(object sender, PlayerMovement.OnLandedEventArgs e)
     {
-        switch(e.landingType)
+        switch(e.Result.Type)
         {
-            case PlayerMovement.LandingType.TooSpeedLanding:
-            case PlayerMovement.LandingType.TooSteepAngle:
-            case PlayerMovement.LandingType.WrongLandingArea:
+            case LandingType.TooFast:
+            case LandingType.TooSteep:
+            case LandingType.WrongLandingArea:
                 Instantiate(landerVfx, transform.position, Quaternion.identity);
                 gameObject.SetActive(false);
                 CinemachineCameraShake.Instance.ShakeCamera(8f,  0.25f);
@@ -69,7 +70,18 @@ public class ShipVisual : MonoBehaviour
 
     private void SetEnabledThrusterPaticleSystem(ParticleSystem particleSystem, bool enalbed)
     {
-        ParticleSystem.EmissionModule emissionModule = particleSystem.emission;
-        emissionModule.enabled = enalbed;
+        if (particleSystem == null)
+        {
+            return;
+        }
+
+        ParticleSystem[] particleSystems =
+            particleSystem.GetComponentsInChildren<ParticleSystem>(true);
+
+        foreach (ParticleSystem currentParticleSystem in particleSystems)
+        {
+            ParticleSystem.EmissionModule emissionModule = currentParticleSystem.emission;
+            emissionModule.enabled = enalbed;
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using SpaceP.Scoring;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -20,24 +21,17 @@ public class PlayerMovement : MonoBehaviour
 
     public class OnLandedEventArgs : EventArgs
     {
-        public LandingType landingType;
-        public int score;
-        public float dotVector;
-        public float speed;
-        public int scoreMultiplier;
+        public OnLandedEventArgs(LandingResult result)
+        {
+            Result = result;
+        }
+
+        public LandingResult Result { get; }
     }
 
     public class OnStateChangeEventArgs : EventArgs
     {
         public State State;
-    }
-
-    public enum LandingType
-    {
-        Success,
-        WrongLandingArea,
-        TooSpeedLanding,
-        TooSteepAngle,
     }
 
     public enum State
@@ -52,6 +46,9 @@ public class PlayerMovement : MonoBehaviour
     private float fuelAmountMax = 10f;
     private State state;
 
+    [Header("Landing Scoring")]
+    [SerializeField] private LandingScoringConfig landingScoringConfig;
+
     private bool hasLandingResult;
     private bool tutorialControlLocked;
     private RigidbodyConstraints2D constraintsBeforeTutorial;
@@ -60,6 +57,14 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+
+        if (landingScoringConfig == null)
+        {
+            Debug.LogWarning(
+                $"{nameof(PlayerMovement)} on '{name}' has no {nameof(LandingScoringConfig)} assigned. " +
+                "Default landing scoring settings will be used.",
+                this);
+        }
 
         // STORE CHANGED:
         // Fuel max lấy từ UpgradeManager thay vì hardcode 10f.
@@ -154,99 +159,35 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        if (!collision.gameObject.TryGetComponent(out LandingPlace landingPlace))
-        {
-            Debug.Log("Crashed on the Terrain");
+        bool isLandingArea = collision.gameObject.TryGetComponent(out LandingPlace landingPlace);
+        int scoreMultiplier = isLandingArea ? landingPlace.GetScoreMultiplier() : 0;
 
-            hasLandingResult = true;
+        LandingAttempt attempt = new LandingAttempt(
+            isLandingArea,
+            collision.relativeVelocity.magnitude,
+            Vector2.Dot(Vector2.up, transform.up),
+            UpgradeManager.GetSoftLandingVelocityMagnitude(),
+            UpgradeManager.GetMinLandingDotVector(),
+            scoreMultiplier);
 
-            onLanded?.Invoke(this, new OnLandedEventArgs
-            {
-                landingType = LandingType.WrongLandingArea,
-                dotVector = 0f,
-                speed = 0f,
-                scoreMultiplier = 0,
-                score = 0,
-            });
+        LandingScoringSettings settings = landingScoringConfig != null
+            ? landingScoringConfig.GetSettings()
+            : LandingScoringSettings.Default;
 
-            SetState(State.GameOver);
-            return;
-        }
-
-        float softLandingVelocityMagnitude = UpgradeManager.GetSoftLandingVelocityMagnitude();
-
-        float relaticeVelocityMagnitude = collision.relativeVelocity.magnitude;
-
-        if (relaticeVelocityMagnitude > softLandingVelocityMagnitude)
-        {
-            Debug.Log("Landed was high");
-
-            hasLandingResult = true;
-
-            onLanded?.Invoke(this, new OnLandedEventArgs
-            {
-                landingType = LandingType.TooSpeedLanding,
-                dotVector = 0f,
-                speed = relaticeVelocityMagnitude,
-                scoreMultiplier = 0,
-                score = 0,
-            });
-
-            SetState(State.GameOver);
-            return;
-        }
-
-        float dotVector = Vector2.Dot(Vector2.up, transform.up);
-
-        float minDotVector = UpgradeManager.GetMinLandingDotVector();
-
-        if (dotVector < minDotVector)
-        {
-            Debug.Log("Landed on a too steep angle");
-
-            hasLandingResult = true;
-
-            onLanded?.Invoke(this, new OnLandedEventArgs
-            {
-                landingType = LandingType.TooSteepAngle,
-                dotVector = dotVector,
-                speed = relaticeVelocityMagnitude,
-                scoreMultiplier = 0,
-                score = 0,
-            });
-
-            SetState(State.GameOver);
-            return;
-        }
-
-        Debug.Log("Successfull landed");
-
-        float maxScoreAmountLandingAngle = 100;
-        float scoreDotVectorMutiplier = 10f;
-        float landingAngleScore = maxScoreAmountLandingAngle - Mathf.Abs(dotVector - 1f) * scoreDotVectorMutiplier * maxScoreAmountLandingAngle;
-
-        float maxScoreAmountLandingSpeed = 100;
-        float landingSpeedScore = (softLandingVelocityMagnitude - relaticeVelocityMagnitude) * maxScoreAmountLandingSpeed;
-
-        Debug.Log("Landing Angle Score" + landingAngleScore);
-        Debug.Log("Landing speed Score" + landingSpeedScore);
-
-        int score = Mathf.RoundToInt((landingAngleScore + landingSpeedScore) * landingPlace.GetScoreMultiplier());
-
-        Debug.Log("Score :" + score);
+        LandingResult result = LandingEvaluator.Evaluate(attempt, settings);
 
         hasLandingResult = true;
 
-        StopLanderAfterSuccessLanding();
-
-        onLanded?.Invoke(this, new OnLandedEventArgs
+        if (result.IsSuccess)
         {
-            landingType = LandingType.Success,
-            dotVector = dotVector,
-            speed = relaticeVelocityMagnitude,
-            scoreMultiplier = landingPlace.GetScoreMultiplier(),
-            score = score,
-        });
+            StopLanderAfterSuccessLanding();
+        }
+
+        Debug.Log(
+            $"Landing result={result.Type} speed={result.ImpactSpeed:0.00} " +
+            $"uprightness={result.Uprightness:0.000} score={result.Score}");
+
+        onLanded?.Invoke(this, new OnLandedEventArgs(result));
 
         SetState(State.GameOver);
     }
@@ -313,13 +254,18 @@ public class PlayerMovement : MonoBehaviour
 
     public float GetFuelAmountNormalized()
     {
-        return fuelAmount / fuelAmountMax;
+        if (fuelAmountMax <= 0f)
+        {
+            return 0f;
+        }
+
+        return Mathf.Clamp01(fuelAmount / fuelAmountMax);
     }
 
     private void ConsumeFuel()
     {
         float fuelConsumeAmount = 1f;
-        fuelAmount -= fuelConsumeAmount * Time.deltaTime;
+        fuelAmount = Mathf.Max(0f, fuelAmount - fuelConsumeAmount * Time.fixedDeltaTime);
     }
 
     public float GetFuel()

@@ -1,3 +1,4 @@
+using SpaceP.Scoring;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using System;
@@ -37,9 +38,9 @@ public class SoundManager : MonoBehaviour
 
     private void Player_onLanded(object sender, PlayerMovement.OnLandedEventArgs e)
     {
-        switch (e.landingType)
+        switch (e.Result.Type)
         {
-            case PlayerMovement.LandingType.Success:
+            case LandingType.Success:
                 AudioSource.PlayClipAtPoint(landedSuccessfullAudioClip, Camera.main.transform.position, GetSoundVolumeNormalized());
                 break;
             default:

@@ -1,5 +1,6 @@
 using System;
 using DG.Tweening;
+using SpaceP.Scoring;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,10 +12,23 @@ public class LandedUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI nextButtonTextMexh;
     [SerializeField] private Button nextButton;
     [SerializeField] private Sprite rewardCoinSprite;
+    [Header("Result Animation")]
+    [SerializeField] private GameObject bannerObject;
+    [SerializeField] private GameObject statsPanelObject;
+    [SerializeField] private GameObject statsLabelsObject;
+    [Header("Fail Upgrade Suggestion")]
+    [SerializeField] private GameObject upgradeSuggestionPanel;
+    [SerializeField] private Button storeButton;
+    [SerializeField] private Button retryButton;
 
     private Action nextButtonClickAction;
     private GameObject rewardPanel;
     private TextMeshProUGUI rewardValueText;
+    private Sequence resultSequence;
+
+    private const float BannerDuration = 0.28f;
+    private const float StatsDuration = 0.26f;
+    private const float FinalPanelDuration = 0.28f;
 
     private void Awake()
     {
@@ -24,6 +38,27 @@ public class LandedUI : MonoBehaviour
         {
             nextButtonClickAction?.Invoke();
         });
+
+        if (storeButton != null)
+        {
+            storeButton.onClick.AddListener(() =>
+            {
+                SceneLoader.LoadScene(SceneLoader.Scene.StoreScreen);
+            });
+        }
+
+        if (retryButton != null)
+        {
+            retryButton.onClick.AddListener(() =>
+            {
+                GameManager.Instance.RetryLevel();
+            });
+        }
+
+        if (upgradeSuggestionPanel != null)
+        {
+            upgradeSuggestionPanel.SetActive(false);
+        }
     }
 
     private void Start()
@@ -36,37 +71,40 @@ public class LandedUI : MonoBehaviour
 
     private void lander_onLanded(object sender, PlayerMovement.OnLandedEventArgs e)
     {
-        bool successLanding = e.landingType == PlayerMovement.LandingType.Success;
+        bool successLanding = e.Result.IsSuccess;
 
         if (successLanding)
         {
             titleTextMesh.text = "SUCCESSFUL LANDING!";
             nextButtonTextMexh.text = "NEXT LEVEL";
             nextButtonClickAction = GameManager.Instance.NextLevel;
-            ShowRewardPanel(GameManager.Instance.GetCurrentLevelCompleteCoinReward());
+            nextButton.gameObject.SetActive(true);
+            PrepareRewardPanel(GameManager.Instance.GetCurrentLevelCompleteCoinReward());
+            if (upgradeSuggestionPanel != null)
+            {
+                upgradeSuggestionPanel.SetActive(false);
+            }
         }
         else
         {
-            titleTextMesh.text = GetCrashTitle(e.landingType);
+            titleTextMesh.text = GetCrashTitle(e.Result.Type);
             nextButtonTextMexh.text = "RESTART";
             nextButtonClickAction = GameManager.Instance.RetryLevel;
+            nextButton.gameObject.SetActive(upgradeSuggestionPanel == null);
             rewardPanel.SetActive(false);
+            if (upgradeSuggestionPanel != null)
+            {
+                upgradeSuggestionPanel.SetActive(true);
+            }
         }
 
         statsTextMesh.text =
-            Mathf.Round(e.speed * 2f) + "\n" +
-            Mathf.Round(e.dotVector * 100f) + "\n" +
-            "x" + e.scoreMultiplier + "\n" +
-            e.score;
+            e.Result.ImpactSpeed.ToString("0.0") + "\n" +
+            Mathf.Round(e.Result.Uprightness * 100f) + "\n" +
+            "x" + e.Result.ScoreMultiplier + "\n" +
+            e.Result.Score;
 
-        Show();
-
-        DOTweenUIAnimator.PunchScale(titleTextMesh.transform, successLanding ? 0.14f : 0.22f);
-
-        if (!successLanding && TryGetComponent(out RectTransform rectTransform))
-        {
-            rectTransform.DOShakeAnchorPos(0.28f, 12f, 14, 90f, false, true);
-        }
+        PlayResultSequence(successLanding);
     }
 
     private void CreateRewardPanel()
@@ -191,7 +229,7 @@ public class LandedUI : MonoBehaviour
         return text;
     }
 
-    private void ShowRewardPanel(int rewardCoins)
+    private void PrepareRewardPanel(int rewardCoins)
     {
         if (rewardPanel == null || rewardValueText == null)
         {
@@ -200,35 +238,172 @@ public class LandedUI : MonoBehaviour
 
         rewardValueText.text = "+" + Mathf.Max(0, rewardCoins) + " COINS";
         rewardPanel.SetActive(true);
-
-        CanvasGroup canvasGroup = rewardPanel.GetComponent<CanvasGroup>();
-        canvasGroup.alpha = 0f;
-        rewardPanel.transform.localScale = Vector3.one * 0.85f;
-        rewardPanel.transform.DOKill();
-        canvasGroup.DOKill();
-
-        canvasGroup
-            .DOFade(1f, 0.2f)
-            .SetDelay(0.15f)
-            .SetLink(rewardPanel);
-        rewardPanel.transform
-            .DOScale(Vector3.one, 0.32f)
-            .SetDelay(0.15f)
-            .SetEase(Ease.OutBack)
-            .SetLink(rewardPanel);
     }
 
-    private string GetCrashTitle(PlayerMovement.LandingType landingType)
+    private void PlayResultSequence(bool successLanding)
+    {
+        resultSequence?.Kill();
+        gameObject.SetActive(true);
+
+        CanvasGroup rootCanvasGroup = DOTweenUIAnimator.EnsureCanvasGroup(gameObject);
+        rootCanvasGroup.alpha = 1f;
+        rootCanvasGroup.interactable = false;
+        rootCanvasGroup.blocksRaycasts = false;
+
+        GameObject banner = bannerObject != null ? bannerObject : titleTextMesh.gameObject;
+        GameObject statsPanel = statsPanelObject != null ? statsPanelObject : statsTextMesh.gameObject;
+        PreparePopVisual(banner, 0.82f);
+        PrepareFadeVisual(titleTextMesh.gameObject);
+        PrepareSlideVisual(statsPanel, 28f);
+        PrepareSlideVisual(statsLabelsObject, 28f);
+        PrepareSlideVisual(statsTextMesh.gameObject, 28f);
+
+        GameObject finalPanel = successLanding ? rewardPanel : upgradeSuggestionPanel;
+        PreparePopVisual(finalPanel, 0.88f);
+        PreparePopVisual(nextButton.gameObject, 0.9f);
+
+        resultSequence = DOTween.Sequence()
+            .SetLink(gameObject)
+            .SetUpdate(true);
+
+        AppendPop(resultSequence, banner, BannerDuration);
+        JoinFade(resultSequence, titleTextMesh.gameObject, BannerDuration * 0.8f);
+        resultSequence.AppendCallback(() =>
+            DOTweenUIAnimator.PunchScale(titleTextMesh.transform, successLanding ? 0.14f : 0.22f, true));
+        resultSequence.AppendInterval(0.05f);
+        AppendSlide(resultSequence, statsPanel, StatsDuration);
+        JoinSlide(resultSequence, statsLabelsObject, StatsDuration);
+        JoinSlide(resultSequence, statsTextMesh.gameObject, StatsDuration);
+        resultSequence.AppendInterval(0.08f);
+        AppendPop(resultSequence, finalPanel, FinalPanelDuration);
+
+        if (nextButton.gameObject != finalPanel)
+        {
+            JoinPop(resultSequence, nextButton.gameObject, FinalPanelDuration);
+        }
+
+        RectTransform resultRectTransform = null;
+        if (!successLanding)
+        {
+            TryGetComponent(out resultRectTransform);
+        }
+
+        resultSequence.OnComplete(() =>
+        {
+            rootCanvasGroup.interactable = true;
+            rootCanvasGroup.blocksRaycasts = true;
+            SelectDefaultButton();
+
+            if (resultRectTransform != null)
+            {
+                resultRectTransform
+                    .DOShakeAnchorPos(0.28f, 12f, 14, 90f, false, true)
+                    .SetUpdate(true);
+            }
+        });
+    }
+
+    private static void PreparePopVisual(GameObject target, float startScale)
+    {
+        if (target == null || !target.activeInHierarchy)
+        {
+            return;
+        }
+
+        CanvasGroup canvasGroup = DOTweenUIAnimator.EnsureCanvasGroup(target);
+        target.transform.DOKill();
+        canvasGroup.DOKill();
+        canvasGroup.alpha = 0f;
+        target.transform.localScale = DOTweenUIAnimator.GetOriginalScale(target.transform) * startScale;
+    }
+
+    private static void PrepareFadeVisual(GameObject target)
+    {
+        if (target != null && target.activeInHierarchy)
+        {
+            DOTweenUIAnimator.EnsureCanvasGroup(target).alpha = 0f;
+        }
+    }
+
+    private static void PrepareSlideVisual(GameObject target, float offsetY)
+    {
+        if (target == null || !target.activeInHierarchy)
+        {
+            return;
+        }
+
+        RectTransform rectTransform = target.GetComponent<RectTransform>();
+        CanvasGroup canvasGroup = DOTweenUIAnimator.EnsureCanvasGroup(target);
+        rectTransform.DOKill();
+        canvasGroup.DOKill();
+        canvasGroup.alpha = 0f;
+        Vector2 originalPosition = GetOriginalAnchoredPosition(rectTransform);
+        rectTransform.anchoredPosition = originalPosition + Vector2.down * offsetY;
+    }
+
+    private static readonly System.Collections.Generic.Dictionary<int, Vector2> originalAnchoredPositions =
+        new System.Collections.Generic.Dictionary<int, Vector2>();
+
+    private static Vector2 GetOriginalAnchoredPosition(RectTransform rectTransform)
+    {
+        int instanceId = rectTransform.GetInstanceID();
+        if (!originalAnchoredPositions.TryGetValue(instanceId, out Vector2 position))
+        {
+            position = rectTransform.anchoredPosition;
+            originalAnchoredPositions[instanceId] = position;
+        }
+        return position;
+    }
+
+    private static void AppendPop(Sequence sequence, GameObject target, float duration)
+    {
+        if (target == null || !target.activeInHierarchy) return;
+        sequence.Append(DOTweenUIAnimator.EnsureCanvasGroup(target).DOFade(1f, duration * 0.7f));
+        sequence.Join(target.transform.DOScale(DOTweenUIAnimator.GetOriginalScale(target.transform), duration).SetEase(Ease.OutBack));
+    }
+
+    private static void JoinPop(Sequence sequence, GameObject target, float duration)
+    {
+        if (target == null || !target.activeInHierarchy) return;
+        sequence.Join(DOTweenUIAnimator.EnsureCanvasGroup(target).DOFade(1f, duration * 0.7f));
+        sequence.Join(target.transform.DOScale(DOTweenUIAnimator.GetOriginalScale(target.transform), duration).SetEase(Ease.OutBack));
+    }
+
+    private static void JoinFade(Sequence sequence, GameObject target, float duration)
+    {
+        if (target != null && target.activeInHierarchy)
+        {
+            sequence.Join(DOTweenUIAnimator.EnsureCanvasGroup(target).DOFade(1f, duration));
+        }
+    }
+
+    private static void AppendSlide(Sequence sequence, GameObject target, float duration)
+    {
+        if (target == null || !target.activeInHierarchy) return;
+        RectTransform rectTransform = target.GetComponent<RectTransform>();
+        sequence.Append(DOTweenUIAnimator.EnsureCanvasGroup(target).DOFade(1f, duration));
+        sequence.Join(rectTransform.DOAnchorPos(GetOriginalAnchoredPosition(rectTransform), duration).SetEase(Ease.OutCubic));
+    }
+
+    private static void JoinSlide(Sequence sequence, GameObject target, float duration)
+    {
+        if (target == null || !target.activeInHierarchy) return;
+        RectTransform rectTransform = target.GetComponent<RectTransform>();
+        sequence.Join(DOTweenUIAnimator.EnsureCanvasGroup(target).DOFade(1f, duration));
+        sequence.Join(rectTransform.DOAnchorPos(GetOriginalAnchoredPosition(rectTransform), duration).SetEase(Ease.OutCubic));
+    }
+
+    private string GetCrashTitle(LandingType landingType)
     {
         switch (landingType)
         {
-            case PlayerMovement.LandingType.WrongLandingArea:
+            case LandingType.WrongLandingArea:
                 return "<color=#ff0000>TERRAIN HIT</color>";
 
-            case PlayerMovement.LandingType.TooSpeedLanding:
+            case LandingType.TooFast:
                 return "<color=#ff0000>TOO FAST</color>";
 
-            case PlayerMovement.LandingType.TooSteepAngle:
+            case LandingType.TooSteep:
                 return "<color=#ff0000>BAD ANGLE</color>";
 
             default:
@@ -236,19 +411,31 @@ public class LandedUI : MonoBehaviour
         }
     }
 
-    private void Show()
-    {
-        DOTweenUIAnimator.ShowPanel(gameObject);
-        nextButton.Select();
-    }
-
     private void Hide()
     {
         DOTweenUIAnimator.HidePanel(gameObject);
     }
 
+    private void SelectDefaultButton()
+    {
+        if (upgradeSuggestionPanel != null && upgradeSuggestionPanel.activeSelf)
+        {
+            if (storeButton != null)
+            {
+                storeButton.Select();
+            }
+            return;
+        }
+
+        if (nextButton != null && nextButton.gameObject.activeInHierarchy)
+        {
+            nextButton.Select();
+        }
+    }
+
     private void OnDestroy()
     {
+        resultSequence?.Kill();
         if (PlayerMovement.Instance != null)
         {
             PlayerMovement.Instance.onLanded -= lander_onLanded;

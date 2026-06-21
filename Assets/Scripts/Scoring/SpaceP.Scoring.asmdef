@@ -1,0 +1,14 @@
+{
+  "name": "SpaceP.Scoring",
+  "rootNamespace": "SpaceP.Scoring",
+  "references": [],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

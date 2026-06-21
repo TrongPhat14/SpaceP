@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SpaceP.Scoring;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -34,6 +35,7 @@ public class GameManager : MonoBehaviour
     private bool isRunning;
 
     private bool hasLevelCompleted;
+    private bool hasLevelEnded;
 
     private GameLevel spawnedGameLevel;
 
@@ -83,6 +85,11 @@ public class GameManager : MonoBehaviour
 
     private void GameInput_OnMenuButtonPressed(object sender, EventArgs e)
     {
+        if (hasLevelEnded)
+        {
+            return;
+        }
+
         PauseOrUnPauseGame();
     }
 
@@ -179,19 +186,21 @@ public class GameManager : MonoBehaviour
 
     private void Lander_onLanded(object sender, PlayerMovement.OnLandedEventArgs e)
     {
-        if (e.landingType != PlayerMovement.LandingType.Success)
+        hasLevelEnded = true;
+
+        if (!e.Result.IsSuccess)
         {
             AnalyticsManager.LogLevelFail(
                 levelNumber,
-                GetLandingFailReason(e.landingType),
+                GetLandingFailReason(e.Result.Type),
                 time,
-                e.speed,
-                e.dotVector * 100f
+                e.Result.ImpactSpeed,
+                e.Result.Uprightness * 100f
             );
             return;
         }
 
-        AddScore(e.score);
+        AddScore(e.Result.Score);
 
         AnalyticsManager.LogLevelComplete(levelNumber, score, totalScore + score, time);
 
@@ -306,6 +315,11 @@ public class GameManager : MonoBehaviour
 
     public void PauseOrUnPauseGame()
     {
+        if (hasLevelEnded)
+        {
+            return;
+        }
+
         if (Time.timeScale == 1f)
         {
             PauseGame();
@@ -318,8 +332,18 @@ public class GameManager : MonoBehaviour
 
     public void PauseGame()
     {
+        if (hasLevelEnded)
+        {
+            return;
+        }
+
         Time.timeScale = 0f;
         OnGamePaused?.Invoke(this, EventArgs.Empty);
+    }
+
+    public bool HasLevelEnded()
+    {
+        return hasLevelEnded;
     }
 
     public void UnPauseGame()
@@ -328,17 +352,17 @@ public class GameManager : MonoBehaviour
         OnGameUnPaused?.Invoke(this, EventArgs.Empty);
     }
 
-    private string GetLandingFailReason(PlayerMovement.LandingType landingType)
+    private string GetLandingFailReason(LandingType landingType)
     {
         switch (landingType)
         {
-            case PlayerMovement.LandingType.WrongLandingArea:
+            case LandingType.WrongLandingArea:
                 return "wrong_landing_area";
 
-            case PlayerMovement.LandingType.TooSpeedLanding:
+            case LandingType.TooFast:
                 return "too_fast";
 
-            case PlayerMovement.LandingType.TooSteepAngle:
+            case LandingType.TooSteep:
                 return "too_steep_angle";
 
             default:
