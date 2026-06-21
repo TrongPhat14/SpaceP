@@ -22,15 +22,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 662100001234567890, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
       propertyPath: localOffset.y
-      value: 0.25
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 662100001234567890, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
       propertyPath: outlineSize.x
-      value: 0.8
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 662100001234567890, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
       propertyPath: outlineSize.y
-      value: 0.1
+      value: 0.35
       objectReference: {fileID: 0}
     - target: {fileID: 662100001234567890, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
       propertyPath: segmentLength
@@ -46,7 +46,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2528793770665625592, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
       propertyPath: m_Size.y
-      value: 0.65894014
+      value: 0.47542375
       objectReference: {fileID: 0}
     - target: {fileID: 2528793770665625592, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
       propertyPath: m_Offset.x
@@ -54,7 +54,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2528793770665625592, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
       propertyPath: m_Offset.y
-      value: -0.05680093
+      value: 0.03495726
       objectReference: {fileID: 0}
     - target: {fileID: 2528793770665625592, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
       propertyPath: m_LayerOverridePriority

@@ -10170,7 +10170,7 @@ MonoBehaviour:
     priceText: {fileID: 712399957}
   coinsText: {fileID: 272226360}
   coinsChangeText: {fileID: 85354632}
-  purchaseSuccessClip: {fileID: 8300000, guid: 53081585eba9c9b4c900e4e8d0f5d624, type: 3}
+  purchaseSuccessClip: {fileID: 8300000, guid: d2bb9d59ba9afee4cad201fb37b01314, type: 3}
   backButton: {fileID: 1968104320}
   startButton: {fileID: 1497077854}
   rewardedAdButton: {fileID: 806713751}

@@ -76,7 +76,7 @@ public class LeaderboardRowUI : MonoBehaviour
 
         Sequence sequence = DOTween.Sequence()
             .SetLink(gameObject)
-            .SetDelay((rank - 1) * 0.04f);
+            .SetDelay(Mathf.Clamp(rank - 1, 0, 10) * 0.04f);
         sequence.Join(canvasGroup.DOFade(1f, 0.18f));
         sequence.Join(transform.DOScale(originalScale, 0.18f).SetEase(Ease.OutBack));
 

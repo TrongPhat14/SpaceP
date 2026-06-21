@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70f3de7a09f34ef59a61fc4d047c7e8d, type: 3}
+  m_Name: Laser-sentry
+  m_EditorClassIdentifier: Assembly-CSharp::MechanicTutorialData
+  tutorialId: Laser-sentry
+  category: NEW HAZARD
+  title: SENTRY DRONE
+  items:
+  - itemName: SENTRY DRONE
+    icon: {fileID: 2730311130653506804, guid: 12dcf088f84a64b45afad3ce9097ae93, type: 3}
+    description: Stationary drones track your ship and fire when you enter their
+      range. Keep moving and use terrain as cover.

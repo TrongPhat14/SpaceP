@@ -1,15 +1,15 @@
 fileFormatVersion: 2
-guid: b88af691129974a4bab7c47b185954b8
+guid: 776ca13c05a71324a9d46c44711dedb4
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8192327527931970262
-    second: Banner_0
+      213: -516196802821238534
+    second: ChatGPT Image 23_13_36 17 thg 6, 2026_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
     mipMapMode: 0
-    enableMipMap: 1
+    enableMipMap: 0
     sRGBTexture: 1
     linearTexture: 0
     fadeOut: 0
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -85,19 +85,6 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 4
     buildTarget: Standalone
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WindowsStoreApps
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -126,23 +113,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Banner_0
+      name: ChatGPT Image 23_13_36 17 thg 6, 2026_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 1504
-        height: 374
+        x: 80
+        y: 410
+        width: 1376
+        height: 270
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 393, y: 0, z: 397, w: 0}
+      border: {x: 481, y: 0, z: 494, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 6d20a0a5b7ef0b170800000000000000
-      internalID: 8192327527931970262
+      spriteID: af0d5a52eb916d8f0800000000000000
+      internalID: -516196802821238534
       vertices: []
       indices: 
       edges: []
@@ -151,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: c5aed63735cf6ca48b694584fc1b6dfc
+    spriteID: f2cac3a1d815cbc478f687b8fe27a7a7
     internalID: 0
     vertices: []
     indices: 
@@ -159,11 +146,14 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":2.0,"y":1.0},"gridSpriteSize":{"x":768.0,"y":1024.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":2,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      Banner_0: 8192327527931970262
+      ChatGPT Image 23_13_36 17 thg 6, 2026_0: -516196802821238534
+      ChatGPT Image 23_13_36 17 thg 6, 2026_1: 2073650218
   mipmapLimitGroupName: 
-  pSDRemoveMatte: 1
+  pSDRemoveMatte: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

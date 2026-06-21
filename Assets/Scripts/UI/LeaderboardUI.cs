@@ -16,7 +16,10 @@ public class LeaderboardUI : MonoBehaviour
     [Header("Content")]
     [SerializeField] private TextMeshProUGUI statusText;
     [SerializeField] private List<LeaderboardRowUI> rowUIList = new List<LeaderboardRowUI>();
+    [SerializeField] private LeaderboardRowUI myRankRow;
     [SerializeField] private int leaderboardLimit = 10;
+
+    private int loadRequestVersion;
 
     private void Awake()
     {
@@ -52,19 +55,109 @@ public class LeaderboardUI : MonoBehaviour
 
     public void LoadLeaderboard()
     {
+        int requestVersion = ++loadRequestVersion;
         DOTweenUIAnimator.PunchScale(refreshButton != null ? refreshButton.transform : null);
         SetStatus("Loading leaderboard...");
         SetRowsVisible(false);
+        HideMyRankRow();
 
         LeaderboardManager.GetTopEntriesOnline(leaderboardLimit, (entries, message) =>
         {
+            if (requestVersion != loadRequestVersion)
+            {
+                return;
+            }
+
             bool hasEntries = PopulateRows(entries);
 
             if (hasEntries)
             {
                 SetStatus(message);
             }
+
+            LoadMyRank(entries, requestVersion);
         });
+    }
+
+    private void LoadMyRank(List<LeaderboardEntry> topEntries, int requestVersion)
+    {
+        if (myRankRow == null)
+        {
+            return;
+        }
+
+        SaveData saveData = SaveManager.LoadProgress();
+        string playerName = LeaderboardManager.GetSavedPlayerName();
+
+        if (!LeaderboardManager.HasSubmittedCompletedGameScore(saveData) ||
+            string.IsNullOrWhiteSpace(playerName))
+        {
+            HideMyRankRow();
+            return;
+        }
+
+        if (ContainsPlayer(topEntries, playerName, saveData.totalScore))
+        {
+            HideMyRankRow();
+            return;
+        }
+
+        SetStatus("Loading your rank...");
+        LeaderboardManager.GetPlayerRankOnline(playerName, saveData.totalScore, (rank, message) =>
+        {
+            if (requestVersion != loadRequestVersion)
+            {
+                return;
+            }
+
+            if (rank <= 0)
+            {
+                HideMyRankRow();
+                SetStatus(message);
+                return;
+            }
+
+            LeaderboardEntry playerEntry = new LeaderboardEntry(
+                playerName,
+                saveData.totalScore,
+                saveData.levelNumber,
+                saveData.isGameCompleted,
+                0
+            );
+
+            myRankRow.SetEntry(rank, playerEntry, playerName);
+            SetStatus(string.Empty);
+        });
+    }
+
+    private static bool ContainsPlayer(
+        List<LeaderboardEntry> entries,
+        string playerName,
+        int score
+    )
+    {
+        if (entries == null)
+        {
+            return false;
+        }
+
+        foreach (LeaderboardEntry entry in entries)
+        {
+            if (entry != null && entry.playerName == playerName && entry.score == score)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void HideMyRankRow()
+    {
+        if (myRankRow != null)
+        {
+            myRankRow.Hide();
+        }
     }
 
     private bool PopulateRows(List<LeaderboardEntry> entries)

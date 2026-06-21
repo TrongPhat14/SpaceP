@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70f3de7a09f34ef59a61fc4d047c7e8d, type: 3}
+  m_Name: Access-control
+  m_EditorClassIdentifier: Assembly-CSharp::MechanicTutorialData
+  tutorialId: Access-control
+  category: NEW MECHANIC
+  title: ACCESS CONTROL
+  items:
+  - itemName: KEY
+    icon: {fileID: 4653187537127529650, guid: fbd9e8bf7e712cb4ca4ced9f9a2f2df9, type: 3}
+    description: Collect the matching key to activate the lock terminal.
+  - itemName: LOCK TERMINAL
+    icon: {fileID: -1631436778385689210, guid: e234695739d1b7444b9000a5a6cbb06a, type: 3}
+    description: Stay inside the terminal zone for 2 seconds to complete the unlock.
+  - itemName: SECURITY DOOR
+    icon: {fileID: 8385648459396593180, guid: 5ff8fb84b4e657743bfe7bd9d353bbd2, type: 3}
+    description: Wait until both door panels fully retract before flying through.

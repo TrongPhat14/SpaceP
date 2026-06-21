@@ -6,6 +6,7 @@
 [Ll]ogs/
 UserSettings/
 .utmp/
+Assets/_Recovery/
 docs/
 
 *.csproj

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70f3de7a09f34ef59a61fc4d047c7e8d, type: 3}
+  m_Name: Wind-current
+  m_EditorClassIdentifier: Assembly-CSharp::MechanicTutorialData
+  tutorialId: Wind-current
+  category: NEW HAZARD
+  title: WIND CURRENT
+  items:
+  - itemName: WIND CURRENT
+    icon: {fileID: 21300000, guid: cf180bf5f7cfd4642867b4807e8231e4, type: 3}
+    description: Wind zones push your ship in the arrow's direction. Counter-steer
+      early and watch your fuel.

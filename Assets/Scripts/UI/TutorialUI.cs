@@ -27,6 +27,7 @@ public class TutorialUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI titleText;
     [SerializeField] private TextMeshProUGUI instructionText;
     [SerializeField] private Button skipButton;
+    [SerializeField] private StatsUI statsUI;
 
     [Header("Highlight Targets")]
     [SerializeField] private RectTransform upButtonVisual;
@@ -56,6 +57,7 @@ public class TutorialUI : MonoBehaviour
     {
         rootRect = (RectTransform)transform;
         ConfigureHighlightFrame();
+        ConfigureSkipButtonAppearance();
         SetPresentationVisible(false);
 
         yield return null;
@@ -143,6 +145,23 @@ public class TutorialUI : MonoBehaviour
         );
     }
 
+    private void ConfigureSkipButtonAppearance()
+    {
+        if (skipButton == null)
+        {
+            return;
+        }
+
+        Image backgroundImage = skipButton.GetComponent<Image>();
+        if (backgroundImage != null)
+        {
+            backgroundImage.color = Color.clear;
+            backgroundImage.raycastTarget = true;
+        }
+
+        skipButton.transition = Selectable.Transition.None;
+    }
+
     private void CreateHighlightBorder(
         string objectName,
         Vector2 anchorMin,
@@ -174,6 +193,11 @@ public class TutorialUI : MonoBehaviour
 
     private bool HasRequiredReferences()
     {
+        if (statsUI == null && fuelBar != null)
+        {
+            statsUI = fuelBar.GetComponentInParent<StatsUI>();
+        }
+
         return highlightFrame != null &&
             tutorialPopup != null &&
             popupCanvasGroup != null &&
@@ -261,6 +285,7 @@ public class TutorialUI : MonoBehaviour
 
         currentStep = step;
         StopTimedStep();
+        statsUI?.SetTutorialPreviewVisible(step == TutorialStep.Fuel);
 
         switch (step)
         {
@@ -500,6 +525,7 @@ public class TutorialUI : MonoBehaviour
     private void CloseTutorial()
     {
         isActive = false;
+        statsUI?.SetTutorialPreviewVisible(false);
         StopTimedStep();
         HideHighlight();
         UnsubscribeEvents();

@@ -61,6 +61,12 @@ public class PausedUI : MonoBehaviour
 
     private void GameManager_OnGamePaused(object sender, System.EventArgs e)
     {
+        if (GameManager.Instance != null && GameManager.Instance.HasLevelEnded())
+        {
+            Hide();
+            return;
+        }
+
         Show();
     }
 

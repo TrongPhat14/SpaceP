@@ -13,6 +13,7 @@ public class CinemachineCameraShake : MonoBehaviour
     {
         Instance = this;
         cinemachineBasicMultiChannelPerlin = GetComponent<CinemachineBasicMultiChannelPerlin>();
+        ResetShake();
     }
 
     public void ShakeCamera(float intensity, float time)
