@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using System;
 
 public class GameInput : MonoBehaviour
@@ -12,45 +12,76 @@ public class GameInput : MonoBehaviour
     public event EventHandler OnRightButtonPressed;
 
     private InputActions inputActions;
+    private InputAction menuAction;
+    private InputAction upAction;
+    private InputAction leftAction;
+    private InputAction rightAction;
+    private InputAction movementAction;
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         Instance = this;
         inputActions = new InputActions();
-        inputActions.Enable();
-        inputActions.Player.Menu.performed += Menu_performed;
-        inputActions.Player.LanderUp.performed += LanderUp_performed;
-        inputActions.Player.LanderLeft.performed += LanderLeft_performed;
-        inputActions.Player.LanderRight.performed += LanderRight_performed;
+        CacheActions();
     }
 
-    private void Menu_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    private void OnEnable()
+    {
+        if (inputActions == null)
+        {
+            return;
+        }
+
+        menuAction.performed += HandleMenuPerformed;
+        upAction.performed += HandleUpPerformed;
+        leftAction.performed += HandleLeftPerformed;
+        rightAction.performed += HandleRightPerformed;
+        inputActions.Enable();
+    }
+
+    private void OnDisable()
+    {
+        if (inputActions == null)
+        {
+            return;
+        }
+
+        menuAction.performed -= HandleMenuPerformed;
+        upAction.performed -= HandleUpPerformed;
+        leftAction.performed -= HandleLeftPerformed;
+        rightAction.performed -= HandleRightPerformed;
+        inputActions.Disable();
+    }
+
+    private void HandleMenuPerformed(InputAction.CallbackContext context)
     {
         OnMenuButtonPressed?.Invoke(this, EventArgs.Empty);
     }
 
-    private void LanderUp_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    private void HandleUpPerformed(InputAction.CallbackContext context)
     {
         OnUpButtonPressed?.Invoke(this, EventArgs.Empty);
     }
 
-    private void LanderLeft_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    private void HandleLeftPerformed(InputAction.CallbackContext context)
     {
         OnLeftButtonPressed?.Invoke(this, EventArgs.Empty);
     }
 
-    private void LanderRight_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    private void HandleRightPerformed(InputAction.CallbackContext context)
     {
         OnRightButtonPressed?.Invoke(this, EventArgs.Empty);
     }
 
     private void OnDestroy()
     {
-        inputActions.Player.Menu.performed -= Menu_performed;
-        inputActions.Player.LanderUp.performed -= LanderUp_performed;
-        inputActions.Player.LanderLeft.performed -= LanderLeft_performed;
-        inputActions.Player.LanderRight.performed -= LanderRight_performed;
-        inputActions.Disable();
+        inputActions?.Dispose();
 
         if (Instance == this)
         {
@@ -60,22 +91,30 @@ public class GameInput : MonoBehaviour
 
     public bool IsUpActionPressed()
     {
-        return inputActions.Player.LanderUp.IsPressed();
+        return upAction != null && upAction.IsPressed();
     }
 
     public bool IsRightActionPressed()
     {
-        return inputActions.Player.LanderRight.IsPressed();
+        return rightAction != null && rightAction.IsPressed();
     }
 
     public bool IsLeftActionPressed()
     {
-        return inputActions.Player.LanderLeft.IsPressed();
+        return leftAction != null && leftAction.IsPressed();
     }
 
     public Vector2 GetMovementInputVector2()
     {
-        return inputActions.Player.Movement.ReadValue<Vector2>();
+        return movementAction != null ? movementAction.ReadValue<Vector2>() : Vector2.zero;
     }
 
+    private void CacheActions()
+    {
+        menuAction = inputActions.Player.Menu;
+        upAction = inputActions.Player.LanderUp;
+        leftAction = inputActions.Player.LanderLeft;
+        rightAction = inputActions.Player.LanderRight;
+        movementAction = inputActions.Player.Movement;
+    }
 }

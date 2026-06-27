@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public static class SceneLoader
 {
     public enum Scene
@@ -11,6 +13,17 @@ public static class SceneLoader
 
     public static void LoadScene(Scene scene)
     {
-        SceneTransition.LoadScene(scene.ToString());
+        LoadScene(scene.ToString());
+    }
+
+    public static void LoadScene(string sceneName)
+    {
+        if (string.IsNullOrWhiteSpace(sceneName))
+        {
+            Debug.LogError("SceneLoader received an empty scene name.");
+            return;
+        }
+
+        SceneTransition.LoadScene(sceneName);
     }
 }

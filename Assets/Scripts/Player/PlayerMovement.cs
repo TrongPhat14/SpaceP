@@ -1,11 +1,14 @@
-﻿using System;
+using System;
 using SpaceP.Scoring;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
 {
     private const float GRAVITY_NORMAL = 0.7f;
+    private const float GAMEPAD_DEAD_ZONE = 0.4f;
+    private const float FUEL_CONSUME_PER_SECOND = 1f;
+    private const float FUEL_PICKUP_AMOUNT = 10f;
 
     public static PlayerMovement Instance { get; private set; }
 
@@ -18,6 +21,25 @@ public class PlayerMovement : MonoBehaviour
     public event EventHandler onFuelPickUp;
     public event EventHandler onWindForce;
     public event EventHandler<OnLandedEventArgs> onLanded;
+
+    [Header("Landing Scoring")]
+    [SerializeField] private LandingScoringConfig landingScoringConfig;
+
+    private Rigidbody2D rb;
+    private float fuelAmount;
+    private float fuelAmountMax;
+    private State state;
+    private bool hasLandingResult;
+    private bool tutorialControlLocked;
+    private RigidbodyConstraints2D constraintsBeforeTutorial;
+    private float gravityScaleBeforeTutorial;
+
+    public enum State
+    {
+        Normal,
+        WaitingToStart,
+        GameOver,
+    }
 
     public class OnLandedEventArgs : EventArgs
     {
@@ -34,50 +56,13 @@ public class PlayerMovement : MonoBehaviour
         public State State;
     }
 
-    public enum State
-    {
-        Normal,
-        WaitingToStart,
-        GameOver,
-    }
-
-    private Rigidbody2D rb;
-    private float fuelAmount;
-    private float fuelAmountMax = 10f;
-    private State state;
-
-    [Header("Landing Scoring")]
-    [SerializeField] private LandingScoringConfig landingScoringConfig;
-
-    private bool hasLandingResult;
-    private bool tutorialControlLocked;
-    private RigidbodyConstraints2D constraintsBeforeTutorial;
-    private float gravityScaleBeforeTutorial;
-
     private void Awake()
     {
         Instance = this;
-
-        if (landingScoringConfig == null)
-        {
-            Debug.LogWarning(
-                $"{nameof(PlayerMovement)} on '{name}' has no {nameof(LandingScoringConfig)} assigned. " +
-                "Default landing scoring settings will be used.",
-                this);
-        }
-
-        // STORE CHANGED:
-        // Fuel max lấy từ UpgradeManager thay vì hardcode 10f.
-        fuelAmountMax = UpgradeManager.GetFuelAmountMax();
-
-        fuelAmount = fuelAmountMax;
-        state = State.WaitingToStart;
-
-        LandingPlace landingPlace = GetComponent<LandingPlace>();
         rb = GetComponent<Rigidbody2D>();
-        rb.gravityScale = 0f;
 
-        hasLandingResult = false;
+        WarnIfScoringConfigMissing();
+        ResetRuntimeState();
     }
 
     private void FixedUpdate()
@@ -89,62 +74,16 @@ public class PlayerMovement : MonoBehaviour
 
         onBeforeForce?.Invoke(this, EventArgs.Empty);
 
-        Vector2 movementInput = GameInput.Instance.GetMovementInputVector2();
+        PlayerInputSnapshot input = ReadInput();
 
         switch (state)
         {
-            default:
             case State.WaitingToStart:
-                if (GameInput.Instance.IsUpActionPressed() ||
-                    GameInput.Instance.IsRightActionPressed() ||
-                    GameInput.Instance.IsLeftActionPressed() ||
-                    movementInput != Vector2.zero)
-                {
-                    ConsumeFuel();
-                    rb.gravityScale = GRAVITY_NORMAL;
-                    SetState(State.Normal);
-                }
+                UpdateWaitingToStart(input);
                 break;
 
             case State.Normal:
-                if (fuelAmount <= 0f)
-                {
-                    return;
-                }
-
-                if (GameInput.Instance.IsUpActionPressed() ||
-                    GameInput.Instance.IsRightActionPressed() ||
-                    GameInput.Instance.IsLeftActionPressed() ||
-                    movementInput != Vector2.zero)
-                {
-                    ConsumeFuel();
-                }
-
-                float gamePadDeadZone = .4f;
-
-                if (GameInput.Instance.IsUpActionPressed() ||
-                    movementInput.y > gamePadDeadZone)
-                {
-                    float force = UpgradeManager.GetEngineForce();
-                    rb.AddForce(force * transform.up * Time.deltaTime);
-                    onUpForce?.Invoke(this, EventArgs.Empty);
-                }
-
-                if (GameInput.Instance.IsLeftActionPressed() ||
-                    movementInput.x < -gamePadDeadZone)
-                {
-                    float turnSpeed = UpgradeManager.GetTurnSpeed();
-                    rb.AddTorque(+turnSpeed * Time.deltaTime);
-                    onLeftForce?.Invoke(this, EventArgs.Empty);
-                }
-
-                if (GameInput.Instance.IsRightActionPressed() ||
-                    movementInput.x > gamePadDeadZone)
-                {
-                    float turnSpeed = UpgradeManager.GetTurnSpeed();
-                    rb.AddTorque(-turnSpeed * Time.deltaTime);
-                    onRightForce?.Invoke(this, EventArgs.Empty);
-                }
+                UpdateMovement(input);
                 break;
 
             case State.GameOver:
@@ -159,6 +98,135 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
+        LandingResult result = EvaluateLanding(collision);
+        hasLandingResult = true;
+
+        if (result.IsSuccess)
+        {
+            StopLanderAfterSuccessLanding();
+        }
+
+        Debug.Log(
+            $"Landing result={result.Type} speed={result.ImpactSpeed:0.00} " +
+            $"uprightness={result.Uprightness:0.000} score={result.Score}");
+
+        onLanded?.Invoke(this, new OnLandedEventArgs(result));
+        SetState(State.GameOver);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (hasLandingResult)
+        {
+            return;
+        }
+
+        if (collision.TryGetComponent(out FuelPickUp fuel))
+        {
+            AddFuel(FUEL_PICKUP_AMOUNT);
+            onFuelPickUp?.Invoke(this, EventArgs.Empty);
+            fuel.DestroyFuel();
+            return;
+        }
+
+        if (collision.TryGetComponent(out CoinPickUp coin))
+        {
+            onCoinPickUp?.Invoke(this, EventArgs.Empty);
+            coin.DestroyCoin();
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (hasLandingResult || !collision.TryGetComponent(out WindForce wind))
+        {
+            return;
+        }
+
+        onWindForce?.Invoke(this, EventArgs.Empty);
+        rb.AddForce(wind.GetDirection() * wind.GetStrength(), ForceMode2D.Force);
+    }
+
+    private void ResetRuntimeState()
+    {
+        fuelAmountMax = UpgradeManager.GetFuelAmountMax();
+        fuelAmount = fuelAmountMax;
+        hasLandingResult = false;
+        rb.gravityScale = 0f;
+        SetState(State.WaitingToStart);
+    }
+
+    private PlayerInputSnapshot ReadInput()
+    {
+        if (GameInput.Instance == null)
+        {
+            return PlayerInputSnapshot.Empty;
+        }
+
+        Vector2 movement = GameInput.Instance.GetMovementInputVector2();
+
+        return new PlayerInputSnapshot(
+            GameInput.Instance.IsUpActionPressed() || movement.y > GAMEPAD_DEAD_ZONE,
+            GameInput.Instance.IsLeftActionPressed() || movement.x < -GAMEPAD_DEAD_ZONE,
+            GameInput.Instance.IsRightActionPressed() || movement.x > GAMEPAD_DEAD_ZONE,
+            movement != Vector2.zero);
+    }
+
+    private void UpdateWaitingToStart(PlayerInputSnapshot input)
+    {
+        if (!input.HasAnyInput)
+        {
+            return;
+        }
+
+        ConsumeFuel();
+        rb.gravityScale = GRAVITY_NORMAL;
+        SetState(State.Normal);
+    }
+
+    private void UpdateMovement(PlayerInputSnapshot input)
+    {
+        if (fuelAmount <= 0f)
+        {
+            return;
+        }
+
+        if (input.HasAnyInput)
+        {
+            ConsumeFuel();
+        }
+
+        if (input.Thrust)
+        {
+            ApplyThrust();
+        }
+
+        if (input.RotateLeft)
+        {
+            ApplyTorque(+UpgradeManager.GetTurnSpeed());
+            onLeftForce?.Invoke(this, EventArgs.Empty);
+        }
+
+        if (input.RotateRight)
+        {
+            ApplyTorque(-UpgradeManager.GetTurnSpeed());
+            onRightForce?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    private void ApplyThrust()
+    {
+        rb.AddForce(UpgradeManager.GetEngineForce() * Time.deltaTime * transform.up);
+        onUpForce?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void ApplyTorque(float torque)
+    {
+        rb.AddTorque(torque * Time.deltaTime);
+    }
+
+    private LandingResult EvaluateLanding(Collision2D collision)
+    {
         bool isLandingArea = collision.gameObject.TryGetComponent(out LandingPlace landingPlace);
         int scoreMultiplier = isLandingArea ? landingPlace.GetScoreMultiplier() : 0;
 
@@ -174,64 +242,7 @@ public class PlayerMovement : MonoBehaviour
             ? landingScoringConfig.GetSettings()
             : LandingScoringSettings.Default;
 
-        LandingResult result = LandingEvaluator.Evaluate(attempt, settings);
-
-        hasLandingResult = true;
-
-        if (result.IsSuccess)
-        {
-            StopLanderAfterSuccessLanding();
-        }
-
-        Debug.Log(
-            $"Landing result={result.Type} speed={result.ImpactSpeed:0.00} " +
-            $"uprightness={result.Uprightness:0.000} score={result.Score}");
-
-        onLanded?.Invoke(this, new OnLandedEventArgs(result));
-
-        SetState(State.GameOver);
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (hasLandingResult)
-        {
-            return;
-        }
-
-        if (collision.gameObject.TryGetComponent(out FuelPickUp fuel))
-        {
-            float addFuelAmount = 10f;
-            fuelAmount += addFuelAmount;
-
-            if (fuelAmount > fuelAmountMax)
-            {
-                fuelAmount = fuelAmountMax;
-            }
-
-            onFuelPickUp?.Invoke(this, EventArgs.Empty);
-            fuel.DestroyFuel();
-        }
-
-        if (collision.gameObject.TryGetComponent(out CoinPickUp coin))
-        {
-            onCoinPickUp?.Invoke(this, EventArgs.Empty);
-            coin.DestroyCoin();
-        }
-    }
-
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        if (hasLandingResult)
-        {
-            return;
-        }
-
-        if (collision.gameObject.TryGetComponent(out WindForce wind))
-        {
-            onWindForce?.Invoke(this, EventArgs.Empty);
-            rb.AddForce(wind.GetDirection() * wind.GetStrength(), ForceMode2D.Force);
-        }
+        return LandingEvaluator.Evaluate(attempt, settings);
     }
 
     private void StopLanderAfterSuccessLanding()
@@ -242,14 +253,42 @@ public class PlayerMovement : MonoBehaviour
         rb.constraints = RigidbodyConstraints2D.FreezeAll;
     }
 
-    private void SetState(State state)
+    private void SetState(State nextState)
     {
-        this.state = state;
+        if (state == nextState)
+        {
+            return;
+        }
+
+        state = nextState;
 
         onStateChange?.Invoke(this, new OnStateChangeEventArgs
         {
             State = state
         });
+    }
+
+    private void ConsumeFuel()
+    {
+        fuelAmount = Mathf.Max(0f, fuelAmount - FUEL_CONSUME_PER_SECOND * Time.fixedDeltaTime);
+    }
+
+    private void AddFuel(float amount)
+    {
+        fuelAmount = Mathf.Clamp(fuelAmount + amount, 0f, fuelAmountMax);
+    }
+
+    private void WarnIfScoringConfigMissing()
+    {
+        if (landingScoringConfig != null)
+        {
+            return;
+        }
+
+        Debug.LogWarning(
+            $"{nameof(PlayerMovement)} on '{name}' has no {nameof(LandingScoringConfig)} assigned. " +
+            "Default landing scoring settings will be used.",
+            this);
     }
 
     public float GetFuelAmountNormalized()
@@ -260,12 +299,6 @@ public class PlayerMovement : MonoBehaviour
         }
 
         return Mathf.Clamp01(fuelAmount / fuelAmountMax);
-    }
-
-    private void ConsumeFuel()
-    {
-        float fuelConsumeAmount = 1f;
-        fuelAmount = Mathf.Max(0f, fuelAmount - fuelConsumeAmount * Time.fixedDeltaTime);
     }
 
     public float GetFuel()
@@ -297,5 +330,24 @@ public class PlayerMovement : MonoBehaviour
         rb.gravityScale = gravityScaleBeforeTutorial;
         rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0f;
+    }
+
+    private struct PlayerInputSnapshot
+    {
+        public static readonly PlayerInputSnapshot Empty = new PlayerInputSnapshot(false, false, false, false);
+
+        public PlayerInputSnapshot(bool thrust, bool rotateLeft, bool rotateRight, bool analogMovement)
+        {
+            Thrust = thrust;
+            RotateLeft = rotateLeft;
+            RotateRight = rotateRight;
+            AnalogMovement = analogMovement;
+        }
+
+        public bool Thrust { get; }
+        public bool RotateLeft { get; }
+        public bool RotateRight { get; }
+        public bool AnalogMovement { get; }
+        public bool HasAnyInput => Thrust || RotateLeft || RotateRight || AnalogMovement;
     }
 }

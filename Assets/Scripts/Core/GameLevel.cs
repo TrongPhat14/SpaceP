@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class GameLevel : MonoBehaviour
 {
+    private const int MIN_LEVEL_NUMBER = 1;
+
     [SerializeField] private int gameLevel;
     [SerializeField] private Transform landerStartPosition;
     [SerializeField] private Transform cameraStartPosition;
@@ -14,14 +16,19 @@ public class GameLevel : MonoBehaviour
         return gameLevel;
     }
 
+    public bool HasRequiredReferences()
+    {
+        return landerStartPosition != null && cameraStartPosition != null;
+    }
+
     public Vector3 GetLanderStartPosition()
     {
-        return landerStartPosition.position;
+        return landerStartPosition != null ? landerStartPosition.position : transform.position;
     }
 
     public Transform GetCameraStartTargetTransform()
     {
-        return cameraStartPosition;
+        return cameraStartPosition != null ? cameraStartPosition : transform;
     }
 
     public float GetZoomOutOrthographicSize()
@@ -37,5 +44,12 @@ public class GameLevel : MonoBehaviour
     public MechanicTutorialData GetMechanicTutorial()
     {
         return mechanicTutorial;
+    }
+
+    private void OnValidate()
+    {
+        gameLevel = Mathf.Max(MIN_LEVEL_NUMBER, gameLevel);
+        completeCoinReward = Mathf.Max(0, completeCoinReward);
+        zoomOutOrthographicSize = Mathf.Max(0f, zoomOutOrthographicSize);
     }
 }

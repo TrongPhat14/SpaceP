@@ -4,55 +4,89 @@ public class LanderAudio : MonoBehaviour
 {
     [SerializeField] private AudioSource thrusterAudioSource;
 
-    private PlayerMovement lander;
+    private PlayerMovement playerMovement;
 
     private void Awake()
     {
-        lander = GetComponent<PlayerMovement>();
+        playerMovement = GetComponent<PlayerMovement>();
     }
 
-    private void Start()
+    private void OnEnable()
     {
-        lander.onBeforeForce += Lander_onBeforeForce;
-        lander.onUpForce += Lander_onUpForce;
-        lander.onLeftForce += Lander_onLeftForce;
-        lander.onRightForce += Lander_onRightForce;
+        if (playerMovement == null)
+        {
+            return;
+        }
 
-        SoundManager.Instance.OnSoundVolumeChange += SoundManager_OnSoundVolumeChange;
-        thrusterAudioSource.Pause();
+        playerMovement.onBeforeForce += HandleBeforeForce;
+        playerMovement.onUpForce += HandleThrusterForce;
+        playerMovement.onLeftForce += HandleThrusterForce;
+        playerMovement.onRightForce += HandleThrusterForce;
+
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.OnSoundVolumeChange += HandleSoundVolumeChanged;
+        }
+
+        RefreshVolume();
+        StopThrusterLoop();
     }
 
-    private void SoundManager_OnSoundVolumeChange(object sender, System.EventArgs e)
+    private void OnDisable()
     {
+        if (playerMovement != null)
+        {
+            playerMovement.onBeforeForce -= HandleBeforeForce;
+            playerMovement.onUpForce -= HandleThrusterForce;
+            playerMovement.onLeftForce -= HandleThrusterForce;
+            playerMovement.onRightForce -= HandleThrusterForce;
+        }
+
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.OnSoundVolumeChange -= HandleSoundVolumeChanged;
+        }
+
+        StopThrusterLoop();
+    }
+
+    private void HandleSoundVolumeChanged(object sender, System.EventArgs e)
+    {
+        RefreshVolume();
+    }
+
+    private void HandleBeforeForce(object sender, System.EventArgs e)
+    {
+        StopThrusterLoop();
+    }
+
+    private void HandleThrusterForce(object sender, System.EventArgs e)
+    {
+        if (thrusterAudioSource == null || thrusterAudioSource.isPlaying)
+        {
+            return;
+        }
+
+        thrusterAudioSource.Play();
+    }
+
+    private void RefreshVolume()
+    {
+        if (thrusterAudioSource == null || SoundManager.Instance == null)
+        {
+            return;
+        }
+
         thrusterAudioSource.volume = SoundManager.Instance.GetSoundVolumeNormalized();
     }
 
-    private void Lander_onRightForce(object sender, System.EventArgs e)
+    private void StopThrusterLoop()
     {
-        if(!thrusterAudioSource.isPlaying)
+        if (thrusterAudioSource == null)
         {
-            thrusterAudioSource.Play();
+            return;
         }
-    }
 
-    private void Lander_onLeftForce(object sender, System.EventArgs e)
-    {
-        if (!thrusterAudioSource.isPlaying)
-        {
-            thrusterAudioSource.Play();
-        }
-    }
-
-    private void Lander_onUpForce(object sender, System.EventArgs e)
-    {
-        if (!thrusterAudioSource.isPlaying)
-        {
-            thrusterAudioSource.Play();
-        }
-    }
-
-    private void Lander_onBeforeForce(object sender, System.EventArgs e)
-    {
         thrusterAudioSource.Pause();
     }
 }

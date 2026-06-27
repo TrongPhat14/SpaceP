@@ -1,7 +1,6 @@
+using System;
 using SpaceP.Scoring;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using System;
 
 public class SoundManager : MonoBehaviour
 {
@@ -21,45 +20,59 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private AudioClip crashAudioClip;
 
     private float lastWindSoundTime = -WIND_SOUND_COOLDOWN;
+    private Camera cachedCamera;
+    private bool isSubscribedToPlayer;
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         Instance = this;
+        cachedCamera = Camera.main;
     }
+
     private void Start()
     {
-        PlayerMovement.Instance.onCoinPickUp += Player_onCoinPickUp;
-        PlayerMovement.Instance.onFuelPickUp += Player_onFuelPickUp;
-        PlayerMovement.Instance.onWindForce += Player_onWindForce;
-        PlayerMovement.Instance.onLanded += Player_onLanded;
+        SubscribeToPlayerEvents();
     }
 
-
-
-    private void Player_onLanded(object sender, PlayerMovement.OnLandedEventArgs e)
+    private void OnDisable()
     {
-        switch (e.Result.Type)
+        UnsubscribeFromPlayerEvents();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
         {
-            case LandingType.Success:
-                AudioSource.PlayClipAtPoint(landedSuccessfullAudioClip, Camera.main.transform.position, GetSoundVolumeNormalized());
-                break;
-            default:
-                AudioSource.PlayClipAtPoint(crashAudioClip, Camera.main.transform.position, GetSoundVolumeNormalized());
-                break;
+            Instance = null;
         }
     }
 
-    private void Player_onFuelPickUp(object sender, System.EventArgs e)
+    private void HandleLandingResult(object sender, PlayerMovement.OnLandedEventArgs e)
     {
-        AudioSource.PlayClipAtPoint(fuelPickUpAudioClip, Camera.main.transform.position, GetSoundVolumeNormalized());
+        AudioClip clip = e.Result.Type == LandingType.Success
+            ? landedSuccessfullAudioClip
+            : crashAudioClip;
+
+        PlayClip(clip);
     }
 
-    private void Player_onCoinPickUp(object sender, System.EventArgs e)
+    private void HandleFuelPickup(object sender, EventArgs e)
     {
-        AudioSource.PlayClipAtPoint(coinPickUpAudioClip, Camera.main.transform.position, GetSoundVolumeNormalized());
-
+        PlayClip(fuelPickUpAudioClip);
     }
-    private void Player_onWindForce(object sender, EventArgs e)
+
+    private void HandleCoinPickup(object sender, EventArgs e)
+    {
+        PlayClip(coinPickUpAudioClip);
+    }
+
+    private void HandleWindForce(object sender, EventArgs e)
     {
         if (Time.time < lastWindSoundTime + WIND_SOUND_COOLDOWN)
         {
@@ -67,7 +80,7 @@ public class SoundManager : MonoBehaviour
         }
 
         lastWindSoundTime = Time.time;
-        AudioSource.PlayClipAtPoint(WindAudioClip, Camera.main.transform.position, GetSoundVolumeNormalized());
+        PlayClip(WindAudioClip);
     }
 
     public void ChangeSoundVolume()
@@ -83,7 +96,51 @@ public class SoundManager : MonoBehaviour
 
     public float GetSoundVolumeNormalized()
     {
-        return  ((float)soundVolume) / SOUND_VOLUME_MAX;
+        return Mathf.Clamp01((float)soundVolume / SOUND_VOLUME_MAX);
     }
 
+    public void PlayClip(AudioClip clip)
+    {
+        if (clip == null)
+        {
+            return;
+        }
+
+        if (cachedCamera == null)
+        {
+            cachedCamera = Camera.main;
+        }
+
+        Vector3 position = cachedCamera != null ? cachedCamera.transform.position : Vector3.zero;
+        AudioSource.PlayClipAtPoint(clip, position, GetSoundVolumeNormalized());
+    }
+
+    private void SubscribeToPlayerEvents()
+    {
+        if (isSubscribedToPlayer || PlayerMovement.Instance == null)
+        {
+            return;
+        }
+
+        PlayerMovement.Instance.onCoinPickUp += HandleCoinPickup;
+        PlayerMovement.Instance.onFuelPickUp += HandleFuelPickup;
+        PlayerMovement.Instance.onWindForce += HandleWindForce;
+        PlayerMovement.Instance.onLanded += HandleLandingResult;
+        isSubscribedToPlayer = true;
+    }
+
+    private void UnsubscribeFromPlayerEvents()
+    {
+        if (!isSubscribedToPlayer || PlayerMovement.Instance == null)
+        {
+            isSubscribedToPlayer = false;
+            return;
+        }
+
+        PlayerMovement.Instance.onCoinPickUp -= HandleCoinPickup;
+        PlayerMovement.Instance.onFuelPickUp -= HandleFuelPickup;
+        PlayerMovement.Instance.onWindForce -= HandleWindForce;
+        PlayerMovement.Instance.onLanded -= HandleLandingResult;
+        isSubscribedToPlayer = false;
+    }
 }
