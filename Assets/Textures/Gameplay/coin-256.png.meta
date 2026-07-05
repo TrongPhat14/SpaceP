@@ -1,11 +1,11 @@
-fileFormatVersion: 2
+﻿fileFormatVersion: 2
 guid: 469e60d338347ab429e56aaf70eba747
 AssetOrigin:
   serializedVersion: 1
   productId: 298577
   packageName: Space Game GUI kit
   packageVersion: 1.0
-  assetPath: Assets/Space_Exploration_GUI_Kit/Icons/coin-256.png
+  assetPath: Assets/Textures/Gameplay/coin-256.png
   uploadId: 700894
 TextureImporter:
   internalIDToNameTable:

@@ -1,11 +1,11 @@
-fileFormatVersion: 2
+﻿fileFormatVersion: 2
 guid: 439db9d99748e994cba1d27e9292851f
 AssetOrigin:
   serializedVersion: 1
   productId: 298577
   packageName: Space Game GUI kit
   packageVersion: 1.0
-  assetPath: Assets/Space_Exploration_GUI_Kit/Other_Images/Small/object-shadow-small.png
+  assetPath: Assets/Textures/Icon/object-shadow-small.png
   uploadId: 700894
 TextureImporter:
   internalIDToNameTable:

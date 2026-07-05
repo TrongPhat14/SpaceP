@@ -19,7 +19,7 @@ public static class SaveManager
 
         PlayerPrefs.Save();
 
-        Debug.Log($"Save Progress: Level {levelNumber}, Total Score {totalScore}, Completed {isGameCompleted}");
+        ReleaseLog.Log($"Save Progress: Level {levelNumber}, Total Score {totalScore}, Completed {isGameCompleted}");
     }
 
     // Keep your coins separate, use them when you earn more coins or buy upgrades.
@@ -28,7 +28,7 @@ public static class SaveManager
         PlayerPrefs.SetInt(SaveKeys.Coins, coins);
         PlayerPrefs.Save();
 
-        Debug.Log($"Save Coins: {coins}");
+        ReleaseLog.Log($"Save Coins: {coins}");
     }
 
     // Save the level of all 4 upgrades.
@@ -46,7 +46,7 @@ public static class SaveManager
 
         PlayerPrefs.Save();
 
-        Debug.Log(
+        ReleaseLog.Log(
             $"Save Upgrades: Fuel {fuelTankLevel}, Engine {enginePowerLevel}, Rotation {rotationControlLevel}, Landing {landingStabilizerLevel}"
         );
     }
@@ -114,6 +114,6 @@ public static class SaveManager
 
         PlayerPrefs.Save();
 
-        Debug.Log("Save data deleted.");
+        ReleaseLog.Log("Save data deleted.");
     }
 }

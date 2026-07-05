@@ -180,7 +180,7 @@ public class KeyDoorSystem : MonoBehaviour
     {
         if (unlockVisualRenderer == null)
         {
-            Debug.LogWarning("KeyDoorSystem cannot show unlock visual because Unlock Visual Renderer is missing.", this);
+            ReleaseLog.Warning("KeyDoorSystem cannot show unlock visual because Unlock Visual Renderer is missing.", this);
             onComplete?.Invoke();
             return;
         }

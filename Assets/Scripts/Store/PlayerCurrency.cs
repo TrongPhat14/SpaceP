@@ -37,7 +37,7 @@ public static class PlayerCurrency
         coins = Mathf.Clamp(coins + amount, 0, MaxCoins);
         SaveManager.SaveCoins(coins);
 
-        Debug.Log($"Add Coins: {amount}, Current Coins: {coins}");
+        ReleaseLog.Log($"Add Coins: {amount}, Current Coins: {coins}");
     }
 
 
@@ -59,14 +59,14 @@ public static class PlayerCurrency
 
         if (coins < amount)
         {
-            Debug.Log("Not enough coins.");
+            ReleaseLog.Log("Not enough coins.");
             return false;
         }
 
         coins -= amount;
         SaveManager.SaveCoins(coins);
 
-        Debug.Log($"Spend Coins: {amount}, Current Coins: {coins}");
+        ReleaseLog.Log($"Spend Coins: {amount}, Current Coins: {coins}");
         return true;
     }
 

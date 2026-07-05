@@ -52,7 +52,7 @@ public class DoorLock : MonoBehaviour
 
         if (leftBody == null || rightBody == null)
         {
-            Debug.LogWarning("DoorLock cannot open because door body transforms are missing.", this);
+            ReleaseLog.Warning("DoorLock cannot open because door body transforms are missing.", this);
             return;
         }
 

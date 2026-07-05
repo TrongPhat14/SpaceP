@@ -106,7 +106,7 @@ public class PlayerMovement : MonoBehaviour
             StopLanderAfterSuccessLanding();
         }
 
-        Debug.Log(
+        ReleaseLog.Log(
             $"Landing result={result.Type} speed={result.ImpactSpeed:0.00} " +
             $"uprightness={result.Uprightness:0.000} score={result.Score}");
 
@@ -285,7 +285,7 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        Debug.LogWarning(
+        ReleaseLog.Warning(
             $"{nameof(PlayerMovement)} on '{name}' has no {nameof(LandingScoringConfig)} assigned. " +
             "Default landing scoring settings will be used.",
             this);

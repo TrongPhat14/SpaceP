@@ -58,7 +58,7 @@ public static class FirebaseManager
 
             if (IsReady)
             {
-                Debug.Log(message);
+                ReleaseLog.Log(message);
             }
             else
             {

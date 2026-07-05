@@ -266,9 +266,9 @@ MonoBehaviour:
       spriteIndex: 0
       corner: 1
       m_CornerMode: 1
-    - position: {x: -101.83543, y: 4.470668, z: 0}
-      leftTangent: {x: -1.52668, y: 0.096898556, z: 0}
-      rightTangent: {x: 6.2447433, y: -0.3963585, z: 0}
+    - position: {x: -105.46815, y: 4.470668, z: 0}
+      leftTangent: {x: -1.5266571, y: 0.096898556, z: 0}
+      rightTangent: {x: 6.2447357, y: -0.3963585, z: 0}
       mode: 1
       height: 1
       spriteIndex: 0
@@ -487,19 +487,19 @@ MonoBehaviour:
   - {x: -99.76574, y: 12.97207}
   - {x: -100.65365, y: 12.161604}
   - {x: -102.00421, y: 12.185705}
-  - {x: -104.82878, y: 12.635052}
-  - {x: -106.06253, y: 11.883735}
-  - {x: -106.090195, y: 10.34185}
-  - {x: -105.29659, y: 8.419504}
-  - {x: -104.066414, y: 6.5267916}
-  - {x: -102.78445, y: 5.0738125}
-  - {x: -101.83543, y: 4.470668}
-  - {x: -99.16886, y: 4.717319}
-  - {x: -96.52309, y: 5.6464663}
-  - {x: -93.89999, y: 7.0322967}
-  - {x: -91.3015, y: 8.649002}
-  - {x: -88.729546, y: 10.270767}
-  - {x: -86.18602, y: 11.671782}
+  - {x: -105.030014, y: 12.635052}
+  - {x: -106.782715, y: 11.883735}
+  - {x: -107.51997, y: 10.34185}
+  - {x: -107.49951, y: 8.419504}
+  - {x: -106.97894, y: 6.5267916}
+  - {x: -106.21593, y: 5.0738125}
+  - {x: -105.46815, y: 4.470668}
+  - {x: -102.60036, y: 4.717319}
+  - {x: -99.435616, y: 5.6464663}
+  - {x: -96.10293, y: 7.0322967}
+  - {x: -92.73129, y: 8.649002}
+  - {x: -89.44973, y: 10.270767}
+  - {x: -86.387245, y: 11.671782}
   - {x: -83.67284, y: 12.626232}
   - {x: -81.68616, y: 12.834492}
   - {x: -79.72267, y: 12.550186}
@@ -731,19 +731,19 @@ PolygonCollider2D:
       - {x: -99.76574, y: 12.97207}
       - {x: -100.65365, y: 12.161604}
       - {x: -102.00421, y: 12.185705}
-      - {x: -104.82878, y: 12.635052}
-      - {x: -106.06253, y: 11.883735}
-      - {x: -106.090195, y: 10.34185}
-      - {x: -105.29659, y: 8.419504}
-      - {x: -104.066414, y: 6.5267916}
-      - {x: -102.78445, y: 5.0738125}
-      - {x: -101.83543, y: 4.470668}
-      - {x: -99.16886, y: 4.717319}
-      - {x: -96.52309, y: 5.6464663}
-      - {x: -93.89999, y: 7.0322967}
-      - {x: -91.3015, y: 8.649002}
-      - {x: -88.729546, y: 10.270767}
-      - {x: -86.18602, y: 11.671782}
+      - {x: -105.030014, y: 12.635052}
+      - {x: -106.782715, y: 11.883735}
+      - {x: -107.51997, y: 10.34185}
+      - {x: -107.49951, y: 8.419504}
+      - {x: -106.97894, y: 6.5267916}
+      - {x: -106.21593, y: 5.0738125}
+      - {x: -105.46815, y: 4.470668}
+      - {x: -102.60036, y: 4.717319}
+      - {x: -99.435616, y: 5.6464663}
+      - {x: -96.10293, y: 7.0322967}
+      - {x: -92.73129, y: 8.649002}
+      - {x: -89.44973, y: 10.270767}
+      - {x: -86.387245, y: 11.671782}
       - {x: -83.67284, y: 12.626232}
       - {x: -81.68616, y: 12.834492}
       - {x: -79.72267, y: 12.550186}
@@ -2058,13 +2058,21 @@ PrefabInstance:
       propertyPath: scoreMultiplier
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 3361132168233188260, guid: 80f271298d1ccfb41a00d9d3e54b22ad, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.76
+      objectReference: {fileID: 0}
+    - target: {fileID: 3361132168233188260, guid: 80f271298d1ccfb41a00d9d3e54b22ad, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.71
+      objectReference: {fileID: 0}
     - target: {fileID: 5293914208788910015, guid: 80f271298d1ccfb41a00d9d3e54b22ad, type: 3}
       propertyPath: m_Name
       value: LandingArea _x5
       objectReference: {fileID: 0}
     - target: {fileID: 9107940796958827387, guid: 80f271298d1ccfb41a00d9d3e54b22ad, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 61.43
+      value: 61.13
       objectReference: {fileID: 0}
     - target: {fileID: 9107940796958827387, guid: 80f271298d1ccfb41a00d9d3e54b22ad, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2603,6 +2611,14 @@ PrefabInstance:
     - target: {fileID: 3959248199348790478, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7364185021846109201, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 4.95
+      objectReference: {fileID: 0}
+    - target: {fileID: 7364185021846109201, guid: 033c9aba389e3cf4a887551803e22093, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.81
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

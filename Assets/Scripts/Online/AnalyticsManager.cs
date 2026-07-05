@@ -15,7 +15,7 @@ public static class AnalyticsManager
             );
         });
 
-        Debug.Log($"Analytics game_complete total_score={totalScore} level_number={levelNumber} level_name={GetLevelName(levelNumber)}");
+        ReleaseLog.Log($"Analytics game_complete total_score={totalScore} level_number={levelNumber} level_name={GetLevelName(levelNumber)}");
     }
 
     public static void LogLeaderboardSubmit(bool success, int totalScore)
@@ -29,7 +29,7 @@ public static class AnalyticsManager
             );
         });
 
-        Debug.Log($"Analytics leaderboard_submit success={success} total_score={totalScore}");
+        ReleaseLog.Log($"Analytics leaderboard_submit success={success} total_score={totalScore}");
     }
 
     public static void LogLevelStart(int levelNumber, int totalScore)
@@ -44,7 +44,7 @@ public static class AnalyticsManager
             );
         });
 
-        Debug.Log($"Analytics level_start level_number={levelNumber} level_name={GetLevelName(levelNumber)} total_score={totalScore}");
+        ReleaseLog.Log($"Analytics level_start level_number={levelNumber} level_name={GetLevelName(levelNumber)} total_score={totalScore}");
     }
 
     public static void LogLevelComplete(int levelNumber, int levelScore, int totalScore, float timeSeconds)
@@ -63,7 +63,7 @@ public static class AnalyticsManager
             );
         });
 
-        Debug.Log($"Analytics level_complete level_number={levelNumber} level_name={GetLevelName(levelNumber)} level_score={levelScore} total_score={totalScore} time_seconds={roundedTimeSeconds}");
+        ReleaseLog.Log($"Analytics level_complete level_number={levelNumber} level_name={GetLevelName(levelNumber)} level_score={levelScore} total_score={totalScore} time_seconds={roundedTimeSeconds}");
     }
 
     public static void LogLevelFail(int levelNumber, string failReason, float timeSeconds, float speed, float landingAnglePercent)
@@ -85,7 +85,7 @@ public static class AnalyticsManager
             );
         });
 
-        Debug.Log($"Analytics level_fail level_number={levelNumber} level_name={GetLevelName(levelNumber)} fail_reason={failReason} time_seconds={roundedTimeSeconds}");
+        ReleaseLog.Log($"Analytics level_fail level_number={levelNumber} level_name={GetLevelName(levelNumber)} fail_reason={failReason} time_seconds={roundedTimeSeconds}");
     }
 
     public static void LogLevelRetry(int levelNumber, float timeSeconds)
@@ -102,7 +102,7 @@ public static class AnalyticsManager
             );
         });
 
-        Debug.Log($"Analytics level_retry level_number={levelNumber} level_name={GetLevelName(levelNumber)} time_seconds={roundedTimeSeconds}");
+        ReleaseLog.Log($"Analytics level_retry level_number={levelNumber} level_name={GetLevelName(levelNumber)} time_seconds={roundedTimeSeconds}");
     }
 
     private static string GetLevelName(int levelNumber)

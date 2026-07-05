@@ -1,11 +1,11 @@
-fileFormatVersion: 2
+﻿fileFormatVersion: 2
 guid: 103dc10cb3f842e4092bc9ab92b6eef9
 AssetOrigin:
   serializedVersion: 1
   productId: 298577
   packageName: Space Game GUI kit
   packageVersion: 1.0
-  assetPath: Assets/Space_Exploration_GUI_Kit/Settings_&_Menu_Components/Medium/drop-down-button-blank-medium.png
+  assetPath: Assets/Textures/UI/drop-down-button-blank-medium.png
   uploadId: 700894
 TextureImporter:
   internalIDToNameTable:

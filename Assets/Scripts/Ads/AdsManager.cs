@@ -9,6 +9,13 @@ using GoogleMobileAds.Ump.Api;
 
 public class AdsManager : MonoBehaviour
 {
+    private const float ConsentRetryDelaySeconds = 30f;
+    private const float ConsentUpdateTimeoutSeconds = 20f;
+    private const float MobileAdsInitializationTimeoutSeconds = 20f;
+    private const float RewardedAdLoadTimeoutSeconds = 20f;
+    private const float RewardedAdRetryDelaySeconds = 15f;
+    private const bool SkipUmpForAdLoadTest = false;
+
     public enum RewardedAdState
     {
         Initializing,
@@ -56,10 +63,15 @@ public class AdsManager : MonoBehaviour
     private bool isInitializationInProgress;
     private bool rewardGrantedForCurrentAd;
     private Coroutine retryCoroutine;
+    private Coroutine consentUpdateTimeoutCoroutine;
+    private Coroutine initializationTimeoutCoroutine;
+    private Coroutine rewardedAdLoadTimeoutCoroutine;
 
 #if ADMOB_ENABLED && !UNITY_EDITOR
     private bool mobileAdsInitializationStarted;
     private RewardedAd rewardedAd;
+    private int consentRequestId;
+    private int rewardedAdLoadRequestId;
 #endif
 
     private void Awake()
@@ -171,6 +183,23 @@ public class AdsManager : MonoBehaviour
 #if ADMOB_ENABLED && !UNITY_EDITOR
     private void RequestConsentAndInitializeAds()
     {
+        if (SkipUmpForAdLoadTest)
+        {
+            ReleaseLog.Warning(
+                "UMP consent is skipped for local ad loading test. " +
+                "Disable SkipUmpForAdLoadTest before release."
+            );
+            TryInitializeMobileAds(skipConsentCheck: true);
+            return;
+        }
+
+        SetState(RewardedAdState.Initializing, "CHECKING CONSENT...");
+        StopConsentUpdateTimeout();
+
+        int requestId = ++consentRequestId;
+        consentUpdateTimeoutCoroutine =
+            StartCoroutine(HandleConsentUpdateTimeout(requestId));
+
         ConsentRequestParameters requestParameters =
             new ConsentRequestParameters
             {
@@ -181,28 +210,47 @@ public class AdsManager : MonoBehaviour
             requestParameters,
             consentUpdateError =>
             {
+                if (requestId != consentRequestId)
+                {
+                    return;
+                }
+
+                StopConsentUpdateTimeout();
+
                 if (consentUpdateError != null)
                 {
-                    Debug.LogWarning(
+                    ReleaseLog.Warning(
                         "UMP consent update failed: " +
                         consentUpdateError.Message
                     );
-                }
 
-                TryInitializeMobileAds();
+                    TryInitializeMobileAds(skipConsentCheck: false);
+
+                    if (!mobileAdsInitializationStarted)
+                    {
+                        isInitializationInProgress = false;
+                        SetState(
+                            RewardedAdState.Unavailable,
+                            "CONSENT CHECK FAILED"
+                        );
+                        ScheduleConsentRetry();
+                    }
+
+                    return;
+                }
 
                 ConsentForm.LoadAndShowConsentFormIfRequired(
                     consentFormError =>
                     {
                         if (consentFormError != null)
                         {
-                            Debug.LogWarning(
+                            ReleaseLog.Warning(
                                 "UMP consent form failed: " +
                                 consentFormError.Message
                             );
                         }
 
-                        TryInitializeMobileAds();
+                        TryInitializeMobileAds(skipConsentCheck: false);
 
                         if (!mobileAdsInitializationStarted)
                         {
@@ -211,6 +259,7 @@ public class AdsManager : MonoBehaviour
                                 RewardedAdState.Unavailable,
                                 "CONSENT REQUIRED"
                             );
+                            ScheduleConsentRetry();
                         }
                     }
                 );
@@ -218,17 +267,39 @@ public class AdsManager : MonoBehaviour
         );
     }
 
-    private void TryInitializeMobileAds()
+    private IEnumerator HandleConsentUpdateTimeout(int requestId)
+    {
+        yield return new WaitForSecondsRealtime(ConsentUpdateTimeoutSeconds);
+
+        if (requestId != consentRequestId ||
+            CurrentState != RewardedAdState.Initializing)
+        {
+            yield break;
+        }
+
+        consentUpdateTimeoutCoroutine = null;
+        isInitializationInProgress = false;
+        ReleaseLog.Warning("UMP consent update timed out.");
+        SetState(RewardedAdState.Unavailable, "CONSENT TIMEOUT");
+        ScheduleConsentRetry();
+    }
+
+    private void TryInitializeMobileAds(bool skipConsentCheck)
     {
         if (mobileAdsInitializationStarted ||
-            !ConsentInformation.CanRequestAds())
+            (!skipConsentCheck && !ConsentInformation.CanRequestAds()))
         {
             return;
         }
 
         mobileAdsInitializationStarted = true;
+        SetState(RewardedAdState.Initializing, "INITIALIZING ADS...");
+        initializationTimeoutCoroutine =
+            StartCoroutine(HandleMobileAdsInitializationTimeout());
+
         MobileAds.Initialize(_ =>
         {
+            StopInitializationTimeout();
             isInitialized = true;
             isInitializationInProgress = false;
             LoadRewardedAd();
@@ -238,8 +309,13 @@ public class AdsManager : MonoBehaviour
     private void LoadRewardedAd()
     {
         StopRetry();
+        StopRewardedAdLoadTimeout();
         DisposeRewardedAd();
         SetState(RewardedAdState.Loading, "LOADING...");
+
+        int requestId = ++rewardedAdLoadRequestId;
+        rewardedAdLoadTimeoutCoroutine =
+            StartCoroutine(HandleRewardedAdLoadTimeout(requestId));
 
         AdRequest request = new AdRequest();
         RewardedAd.Load(
@@ -247,13 +323,30 @@ public class AdsManager : MonoBehaviour
             request,
             (RewardedAd loadedAd, LoadAdError error) =>
             {
-                if (error != null || loadedAd == null)
+                if (requestId != rewardedAdLoadRequestId)
                 {
-                    SetState(RewardedAdState.Unavailable, "AD UNAVAILABLE");
-                    retryCoroutine = StartCoroutine(RetryLoadAfterDelay());
+                    if (loadedAd != null)
+                    {
+                        loadedAd.Destroy();
+                    }
+
                     return;
                 }
 
+                StopRewardedAdLoadTimeout();
+
+                if (error != null || loadedAd == null)
+                {
+                    ReleaseLog.Warning(
+                        "Rewarded ad load failed: " +
+                        (error != null ? error.ToString() : "Loaded ad is null.")
+                    );
+                    SetState(RewardedAdState.Unavailable, "AD UNAVAILABLE");
+                    ScheduleRewardedAdRetry();
+                    return;
+                }
+
+                StopRetry();
                 rewardedAd = loadedAd;
                 RegisterRewardedAdEvents(rewardedAd);
                 SetState(RewardedAdState.Ready, "FREE COINS");
@@ -264,12 +357,71 @@ public class AdsManager : MonoBehaviour
     private void RegisterRewardedAdEvents(RewardedAd ad)
     {
         ad.OnAdFullScreenContentClosed += LoadRewardedAd;
-        ad.OnAdFullScreenContentFailed += _ => LoadRewardedAd();
+        ad.OnAdFullScreenContentFailed += error =>
+        {
+            ReleaseLog.Warning("Rewarded ad show failed: " + error);
+            LoadRewardedAd();
+        };
+    }
+
+    private IEnumerator HandleMobileAdsInitializationTimeout()
+    {
+        yield return new WaitForSecondsRealtime(
+            MobileAdsInitializationTimeoutSeconds
+        );
+
+        initializationTimeoutCoroutine = null;
+
+        if (isInitialized)
+        {
+            yield break;
+        }
+
+        mobileAdsInitializationStarted = false;
+        isInitializationInProgress = false;
+        SetState(RewardedAdState.Unavailable, "AD INIT TIMEOUT");
+        ScheduleConsentRetry();
+    }
+
+    private IEnumerator HandleRewardedAdLoadTimeout(int requestId)
+    {
+        yield return new WaitForSecondsRealtime(RewardedAdLoadTimeoutSeconds);
+
+        if (requestId != rewardedAdLoadRequestId ||
+            CurrentState != RewardedAdState.Loading)
+        {
+            yield break;
+        }
+
+        rewardedAdLoadTimeoutCoroutine = null;
+        ReleaseLog.Warning("Rewarded ad load timed out.");
+        SetState(RewardedAdState.Unavailable, "AD LOAD TIMEOUT");
+        ScheduleRewardedAdRetry();
+    }
+
+    private void ScheduleConsentRetry()
+    {
+        StopRetry();
+        retryCoroutine = StartCoroutine(RetryConsentAfterDelay());
+    }
+
+    private IEnumerator RetryConsentAfterDelay()
+    {
+        yield return new WaitForSecondsRealtime(ConsentRetryDelaySeconds);
+        retryCoroutine = null;
+        isInitializationInProgress = true;
+        RequestConsentAndInitializeAds();
+    }
+
+    private void ScheduleRewardedAdRetry()
+    {
+        StopRetry();
+        retryCoroutine = StartCoroutine(RetryLoadAfterDelay());
     }
 
     private IEnumerator RetryLoadAfterDelay()
     {
-        yield return new WaitForSecondsRealtime(15f);
+        yield return new WaitForSecondsRealtime(RewardedAdRetryDelaySeconds);
         retryCoroutine = null;
         LoadRewardedAd();
     }
@@ -317,9 +469,45 @@ public class AdsManager : MonoBehaviour
         retryCoroutine = null;
     }
 
+    private void StopInitializationTimeout()
+    {
+        if (initializationTimeoutCoroutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(initializationTimeoutCoroutine);
+        initializationTimeoutCoroutine = null;
+    }
+
+    private void StopConsentUpdateTimeout()
+    {
+        if (consentUpdateTimeoutCoroutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(consentUpdateTimeoutCoroutine);
+        consentUpdateTimeoutCoroutine = null;
+    }
+
+    private void StopRewardedAdLoadTimeout()
+    {
+        if (rewardedAdLoadTimeoutCoroutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(rewardedAdLoadTimeoutCoroutine);
+        rewardedAdLoadTimeoutCoroutine = null;
+    }
+
     private void OnDestroy()
     {
         StopRetry();
+        StopConsentUpdateTimeout();
+        StopInitializationTimeout();
+        StopRewardedAdLoadTimeout();
 
 #if ADMOB_ENABLED && !UNITY_EDITOR
         DisposeRewardedAd();

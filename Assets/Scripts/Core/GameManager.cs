@@ -121,14 +121,14 @@ public class GameManager : MonoBehaviour
         totalScore = saveData.totalScore;
         isGameCompleted = saveData.isGameCompleted;
 
-        Debug.Log($"Loaded Save: Level {levelNumber}, Total Score {totalScore}, Completed {isGameCompleted}");
+        ReleaseLog.Log($"Loaded Save: Level {levelNumber}, Total Score {totalScore}, Completed {isGameCompleted}");
     }
 
     private void LoadCurrentLevel()
     {
         if (isGameCompleted)
         {
-            Debug.Log("Game already completed. Load GameOverScreen.");
+            ReleaseLog.Log("Game already completed. Load GameOverScreen.");
             SceneLoader.LoadScene(SceneLoader.Scene.GameOverScreen);
             return;
         }
@@ -146,7 +146,7 @@ public class GameManager : MonoBehaviour
 
         if (!spawnedGameLevel.HasRequiredReferences())
         {
-            Debug.LogWarning($"Level {spawnedGameLevel.GetLevelNumber()} is missing start references.", spawnedGameLevel);
+            ReleaseLog.Warning($"Level {spawnedGameLevel.GetLevelNumber()} is missing start references.", spawnedGameLevel);
         }
 
         PositionPlayerAtLevelStart();
@@ -248,7 +248,7 @@ public class GameManager : MonoBehaviour
     {
         AddScore(CoinPickupScoreReward);
         currentLevelCoins += CoinPickupCurrencyReward;
-        Debug.Log($"Current Level Coins: {currentLevelCoins}");
+        ReleaseLog.Log($"Current Level Coins: {currentLevelCoins}");
     }
 
     private void LogLevelFail(LandingResult result)
@@ -275,9 +275,9 @@ public class GameManager : MonoBehaviour
         int totalCoinsEarnedThisLevel = currentLevelCoins + rewardCoins;
         PlayerCurrency.AddCoins(totalCoinsEarnedThisLevel);
 
-        Debug.Log($"Pickup Coins This Level: {currentLevelCoins}");
-        Debug.Log($"Complete Level Coin Reward: {rewardCoins}");
-        Debug.Log($"Total Coins Earned This Level: {totalCoinsEarnedThisLevel}");
+        ReleaseLog.Log($"Pickup Coins This Level: {currentLevelCoins}");
+        ReleaseLog.Log($"Complete Level Coin Reward: {rewardCoins}");
+        ReleaseLog.Log($"Total Coins Earned This Level: {totalCoinsEarnedThisLevel}");
 
         SaveNextProgress();
     }
@@ -291,20 +291,20 @@ public class GameManager : MonoBehaviour
             levelNumber = nextLevelNumber;
             isGameCompleted = false;
             SaveManager.SaveProgress(levelNumber, totalScore, isGameCompleted);
-            Debug.Log($"Level Completed And Saved: Next Level {levelNumber}, Total Score {totalScore}");
+            ReleaseLog.Log($"Level Completed And Saved: Next Level {levelNumber}, Total Score {totalScore}");
             return;
         }
 
         isGameCompleted = true;
         SaveManager.SaveProgress(levelNumber, totalScore, isGameCompleted);
         AnalyticsManager.LogGameComplete(totalScore, levelNumber);
-        Debug.Log($"Game Completed And Saved: Last Level {levelNumber}, Total Score {totalScore}");
+        ReleaseLog.Log($"Game Completed And Saved: Last Level {levelNumber}, Total Score {totalScore}");
     }
 
     public void AddScore(int addScore)
     {
         score += addScore;
-        Debug.Log(score);
+        ReleaseLog.Log(score);
     }
 
     public int GetScore()

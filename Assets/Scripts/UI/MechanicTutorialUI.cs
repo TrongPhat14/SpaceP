@@ -57,7 +57,7 @@ public class MechanicTutorialUI : MonoBehaviour
 
         if (string.IsNullOrWhiteSpace(data.tutorialId))
         {
-            Debug.LogWarning(
+            ReleaseLog.Warning(
                 $"Mechanic tutorial '{data.name}' needs a unique tutorialId.",
                 data
             );
@@ -273,7 +273,7 @@ public class MechanicTutorialUI : MonoBehaviour
         }
 
         PlayerPrefs.Save();
-        Debug.Log("Loaded mechanic tutorial progress reset.");
+        ReleaseLog.Log("Loaded mechanic tutorial progress reset.");
     }
 #endif
 }

@@ -74,7 +74,7 @@ public class TutorialUI : MonoBehaviour
             GameInput.Instance == null ||
             PlayerMovement.Instance == null)
         {
-            Debug.LogWarning(
+            ReleaseLog.Warning(
                 "TutorialUI is missing scene references. Assign its UI and highlight targets in the Inspector.",
                 this
             );
@@ -510,7 +510,7 @@ public class TutorialUI : MonoBehaviour
     {
         PlayerPrefs.DeleteKey(SaveKeys.ControlsTutorialCompleted);
         PlayerPrefs.Save();
-        Debug.Log("Controls tutorial progress reset.");
+        ReleaseLog.Log("Controls tutorial progress reset.");
     }
 #endif
 

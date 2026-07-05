@@ -20,7 +20,7 @@ public class CinemachineCameraShake : MonoBehaviour
     {
         if (cinemachineBasicMultiChannelPerlin == null)
         {
-            Debug.LogWarning("CinemachineCameraShake needs a CinemachineBasicMultiChannelPerlin component.");
+            ReleaseLog.Warning("CinemachineCameraShake needs a CinemachineBasicMultiChannelPerlin component.");
             return;
         }
 

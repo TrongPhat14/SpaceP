@@ -69,7 +69,7 @@ public static class UpgradeManager
 
         if (currentLevel >= itemData.maxLevel)
         {
-            Debug.Log($"{itemData.itemName} already max level.");
+            ReleaseLog.Log($"{itemData.itemName} already max level.");
             return false;
         }
 
@@ -83,7 +83,7 @@ public static class UpgradeManager
         SetUpgradeLevel(itemData.upgradeType, currentLevel + 1);
         SaveCurrentUpgradeLevels();
 
-        Debug.Log($"Upgrade Success: {itemData.itemName} Level {currentLevel + 1}");
+        ReleaseLog.Log($"Upgrade Success: {itemData.itemName} Level {currentLevel + 1}");
         return true;
     }
 

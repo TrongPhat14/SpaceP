@@ -1,11 +1,11 @@
-fileFormatVersion: 2
+﻿fileFormatVersion: 2
 guid: cf180bf5f7cfd4642867b4807e8231e4
 AssetOrigin:
   serializedVersion: 1
   productId: 298577
   packageName: Space Game GUI kit
   packageVersion: 1.0
-  assetPath: Assets/Space_Exploration_GUI_Kit/Picto_Icons/White/cloud-128.png
+  assetPath: Assets/Textures/Gameplay/cloud-128.png
   uploadId: 700894
 TextureImporter:
   internalIDToNameTable:

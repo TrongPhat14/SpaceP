@@ -1,11 +1,11 @@
-fileFormatVersion: 2
+﻿fileFormatVersion: 2
 guid: 8b36395ad5b32a248b2641009010fd6b
 AssetOrigin:
   serializedVersion: 1
   productId: 298577
   packageName: Space Game GUI kit
   packageVersion: 1.0
-  assetPath: Assets/Space_Exploration_GUI_Kit/Other_Images/Small/sparkle-small.png
+  assetPath: Assets/Textures/Icon/sparkle-small.png
   uploadId: 700894
 TextureImporter:
   internalIDToNameTable:
